@@ -1,0 +1,18 @@
+<?php
+
+namespace DummyNamespace;
+
+use PerfectOblivion\ActionServiceResponder\Responders\Responder;
+
+class DummyClass extends Responder
+{
+    /**
+     * Send a response.
+     *
+     * @return mixed
+     */
+    public function DummyMethod()
+    {
+        //
+    }
+}

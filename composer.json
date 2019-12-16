@@ -1,0 +1,55 @@
+{
+    "name": "perfect-oblivion/action-service-responder",
+    "description": "Service aware actions for Laravel",
+    "version": "0.0.1",
+    "keywords": [
+        "perfect-oblivion",
+        "actions",
+        "services",
+        "responder",
+        "adr",
+        "asr",
+        "Laravel"
+    ],
+    "homepage": "https://github.com/perfect-oblivion/action-service-responder",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Clayton Stone",
+            "email": "clay@phpstage.com",
+            "homepage": "https://phpstage.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.3",
+        "laravel/framework": "5.8.*|^6.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "PerfectOblivion\\ActionServiceResponder\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PerfectOblivion\\ActionServiceResponder\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "PerfectOblivion\\ActionServiceResponder\\ActionServiceResponderProvider"
+            ]
+        }
+    }
+}

@@ -1,0 +1,21 @@
+<?php
+
+namespace DummyNamespace;
+
+DummyServiceFullNamespace
+use Illuminate\Http\Request;
+use PerfectOblivion\ActionServiceResponder\Actions\Action;
+
+class DummyClass extends Action
+{
+    /**
+     * Execute the action.
+     *
+     *  @param  DummyServiceDocBlock
+     *  @param  \Illuminate\Http\Request  $request
+     */
+    public function DummyMethod(DummyServiceParameterRequest $request)
+    {
+        //
+    }
+}

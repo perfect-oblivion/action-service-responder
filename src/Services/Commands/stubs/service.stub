@@ -1,0 +1,29 @@
+<?php
+
+namespace DummyNamespace;
+
+use PerfectOblivion\ActionServiceResponder\Services\Contracts\Service;
+use PerfectOblivion\ActionServiceResponder\Services\Traits\SelfCallingService;
+
+class DummyClass extends Service
+{
+    use SelfCallingService;
+
+    /**
+     * Construct a new DummyClass.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Handle the call to the service.
+     *
+     * @return mixed
+     */
+    public function DummyMethod()
+    {
+        //
+    }
+}
