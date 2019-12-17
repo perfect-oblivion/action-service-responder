@@ -2,12 +2,15 @@
 
 namespace DummyNamespace;
 
+DummyResponderFullNamespace
 DummyServiceFullNamespace
 use Illuminate\Http\Request;
 use PerfectOblivion\ActionServiceResponder\Actions\Action;
 
 class DummyClass extends Action
 {
+DummyResponderProperty
+
     /**
      * Execute the action.
      *

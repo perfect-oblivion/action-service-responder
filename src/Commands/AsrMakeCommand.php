@@ -24,7 +24,7 @@ class AsrMakeCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'asr:make {name} {--no-action} {--no-service} {--no-responder}  {--valid}';
+    protected $signature = 'asr:make {name} {--no-action} {--no-service} {--no-responder}  {--valid} {--auto-service}';
 
     /**
      * The console command description.
@@ -54,7 +54,8 @@ class AsrMakeCommand extends Command
         if ($this->action) {
             Artisan::call('asr:action', [
                 'name' => $name,
-                '--auto-service' => true,
+                '--auto-service' => $this->option('auto-service'),
+                '--responder' => true,
             ]);
             $this->output->writeln('Action created successfully.');
         }

@@ -2,7 +2,7 @@
 
 namespace DummyNamespace;
 
-use PerfectOblivion\ActionServiceResponder\Services\Contracts\Service;
+use PerfectOblivion\ActionServiceResponder\Services\Service;
 use PerfectOblivion\ActionServiceResponder\Services\Traits\SelfCallingService;
 
 class DummyClass extends Service

@@ -3,11 +3,11 @@
 namespace PerfectOblivion\ActionServiceResponder\Services;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
 
 class QueuedService implements ShouldQueue
 {
@@ -51,7 +51,7 @@ class QueuedService implements ShouldQueue
         $service = app($this->serviceClass);
         $method = Config::get('asr.service_method', 'run');
 
-        $service->{$method}(...$this->parameters);
+        $service->{$method}($this->parameters);
     }
 
     /**

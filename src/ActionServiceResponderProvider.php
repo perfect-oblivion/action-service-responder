@@ -12,8 +12,7 @@ use PerfectOblivion\ActionServiceResponder\Commands\AsrMakeCommand;
 use PerfectOblivion\ActionServiceResponder\Responders\Commands\ResponderMakeCommand;
 use PerfectOblivion\ActionServiceResponder\Services\AbstractServiceCaller;
 use PerfectOblivion\ActionServiceResponder\Services\Commands\ServiceMakeCommand;
-use PerfectOblivion\ActionServiceResponder\Services\Contracts\Service;
-use PerfectOblivion\ActionServiceResponder\Services\Contracts\ShouldQueueService;
+use PerfectOblivion\ActionServiceResponder\Services\Service;
 use PerfectOblivion\ActionServiceResponder\Services\ServiceCaller;
 use PerfectOblivion\ActionServiceResponder\Validation\Commands\CustomRuleMakeCommand;
 use PerfectOblivion\ActionServiceResponder\Validation\Commands\FormRequestMakeCommand;
@@ -82,37 +81,20 @@ class ActionServiceResponderProvider extends BaseServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/asr.php', 'asr');
     }
 
-    private function setResolvingHooks()
+    /**
+     * Set the resolving hooks for package classes.
+     */
+    private function setResolvingHooks(): void
     {
-        $this->app->resolving(ValidatesWhenResolved::class, function ($resolved, $app) {
-            if (method_exists($resolved, 'prepareCustomRules')) {
-                $resolved->prepareCustomRules();
-            }
-        });
-
-        $this->app->resolving(ValidationService::class, function ($resolved, $app) {
-            if (! $this->app->runningInConsole()) {
-                $resolved->data = resolve('request')->all();
-            }
-            $resolved->setContainer($app)->setRedirector($app->make(Redirector::class));
-        });
-
-        if (! $this->app->runningInConsole()) {
-            if (Config::get('asr.service_autorun')) {
-                $this->app->afterResolving(Service::class, function ($service, $app) {
-                    if ($service::$autoRun) {
-                        if ($service instanceof ShouldQueueService) {
-                            $service->autoQueue();
-                        } else {
-                            $service->autoRun();
-                        }
-                    }
-                });
-            }
-        }
+        $this->resolvingValidatesWhenResolved();
+        $this->resolvingValidationService();
+        $this->afterResolvingService();
     }
 
-    private function registerCommands()
+    /**
+     * Register the package commands.
+     */
+    private function registerCommands(): void
     {
         $this->commands([
             ActionMakeCommand::class,
@@ -131,5 +113,62 @@ class ActionServiceResponderProvider extends BaseServiceProvider
     private function bootResponseMacros()
     {
         Response::mixin(new \PerfectOblivion\ActionServiceResponder\Payload\Macros\Response);
+    }
+
+    /**
+     * Is the app running in the context of an Http request?
+     */
+    private function runningInHttpContext(): bool
+    {
+        return ! $this->app->runningInConsole();
+    }
+
+    /**
+     * Are services configured to autorun?
+     */
+    private function shouldAutorunServices(): bool
+    {
+        return Config::get('asr.service_autorun');
+    }
+
+    /**
+     * Set resolving hook for ValidatesWhenResolved.
+     */
+    private function resolvingValidatesWhenResolved(): void
+    {
+        $this->app->resolving(ValidatesWhenResolved::class, function ($resolved) {
+            if (method_exists($resolved, 'prepareCustomRules')) {
+                $resolved->prepareCustomRules();
+            }
+        });
+    }
+
+    /**
+     * Set resolving hook for ValidationService.
+     */
+    private function resolvingValidationService(): void
+    {
+        $this->app->resolving(ValidationService::class, function ($resolved, $app) {
+            if ($this->runningInHttpContext()) {
+                $resolved->setData(resolve('request')->all());
+            }
+            $resolved->setContainer($app)->setRedirector($app->make(Redirector::class));
+        });
+    }
+
+    /**
+     * Set afterResolving hook for a Service.
+     */
+    private function afterResolvingService(): void
+    {
+        if ($this->runningInHttpContext() && $this->shouldAutorunServices()) {
+            $this->app->afterResolving(Service::class, function ($service) {
+                if ($service::$autoRun) {
+                    $validator = $service->getValidator();
+                    $validator ? $service->setValidatedData($validator->validate($validator->data)) : $service->setData(resolve('request')->all());
+                    $service->autoRun();
+                }
+            });
+        }
     }
 }

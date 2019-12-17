@@ -58,12 +58,22 @@ trait InteractsWithValidationData
     }
 
     /**
-     * Replaces the current parameters by a new set.
+     * Replaces the current data with a new set.
      *
-     * @param  array  $parameters
+     * @param  array  $data
      */
-    public function replace(array $data)
+    public function replace(array $data): void
     {
         $this->data = $data;
+    }
+
+    /**
+     * Replaces the current data with a new set.
+     *
+     * @param  array  $data
+     */
+    public function setData(array $data): void
+    {
+        $this->replace($data);
     }
 }

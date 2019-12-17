@@ -160,16 +160,16 @@ class StoreCommentService extends Service
      */
     public function run(array $data)
     {
-        $this->validator->validate();
-
-        //do some work with the data and return the result
+        return $this->doSomeWork($this->validatedData); // see notes below
     }
 }
 ```
 
 > Note: There are a few things going on here. We'll start with the validator.
 
-I'll show below how to generate a validator. If you have received data that needs to be validated, you can inject the validator and call it's validate method. This method will return the validated data so that it can continue to be used in the service. If validation fails, it will perform as Laravel's form requests do and throw an exception, which by default will redirect and inject the validation errors in the $errors object that is available in the view. In the case of an ajax request, a 422 will be returned along with the validation errors in a json object. This functionality can be customized in the same manner as form requests.From that point, the validate method will return all of the original data that was validated. The data can then be used as needed and a result may be returned to the calling class (likely a controller or action).
+I'll show below how to generate a validator. If you have data that needs to be validated, you can inject the validator via the service's constructor. The validator will run automatically if it is injected, and the validated data will be available via the 'validatedData' property. If you would like to manually run the validator, you'll need to call the service directly through it's 'run' method. Then, inside 'run', you can call the validator's 'validate' method, passing the $data parameter. This method will return the validated data so that it can continue to be used in the service.
+
+If validation fails, it will perform as Laravel's form requests do and throw an exception, which by default will redirect and inject the validation errors in the $errors object that is available in the view. In the case of an ajax request, a 422 will be returned along with the validation errors in a json object. This functionality can be customized in the same manner as form requests.
 
 > Note: Any necessary dependencies may be injected via the Service's constructor.
 
@@ -230,7 +230,21 @@ If you need to customize the queue name, connection name, or delay, use public p
 > Note: Automatic services are still experimental.
 
 ### When to use automatically run services
-If you are in the context of an http request and your service is expecting the current request's parameters, the service may be called automatically. If the service has a validator defined, the data will be validated before running the service logic.
+- If you are in the context of an http request
+- If your service is expecting the current request's parameters
+- If there is a result returned from your service.
+
+> Note: If the service has a validator defined, the data will be validated before running the service logic.
+
+> Note: See example below: If you use the autorun functionality and do not use the action's service parameter inside the action, your IDE will likely yell at you. I would only use 'autorun' if you are expecting a return value from the service.
+
+```php
+// StoreComment.php
+public function __invoke(StoreCommentService $service, Request $request)
+{
+    return view('comments.index'); //because we're not using the $service parameter in the method body, your IDE will notify you that $service is unused.
+}
+```
 
 ### How To
   - In your service configuration, set 'autorun' to true.

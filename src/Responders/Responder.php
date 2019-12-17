@@ -4,7 +4,7 @@ namespace PerfectOblivion\ActionServiceResponder\Responders;
 
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Support\Responsable;
-use PerfectOblivion\ActionServiceResponder\Services\Contracts\Service;
+use PerfectOblivion\ActionServiceResponder\Services\Service;
 
 abstract class Responder implements Responsable
 {
@@ -60,7 +60,7 @@ abstract class Responder implements Responsable
     /**
      * Add the service result to the response as the payload.
      *
-     * @param  \PerfectOblivion\ActionServiceResponder\Services\Contracts\Service  $service
+     * @param  \PerfectOblivion\ActionServiceResponder\Services\Service  $service
      *
      * @return $this
      */
