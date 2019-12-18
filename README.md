@@ -23,7 +23,7 @@ You can install the package via composer. From your project directory, in your t
 ```bash
 composer require perfect-oblivion/action-service-responder
 ```
-> Note: Until version 1.0 is released, major features and bug fixes may be added between minor versions. To maintain stability, I recommend a restraint in the form of "0.0.*". This would take the form of:
+> Until version 1.0 is released, major features and bug fixes may be added between minor versions. To maintain stability, I recommend a restraint in the form of "0.0.*". This would take the form of:
 ```bash
 composer require "perfect-oblivion/action-service-responder:0.0.*"
 ```
@@ -64,7 +64,7 @@ In my example-case below, I'll use all three components(Action, Service and Resp
 
 Route::post('comment', Comment\StoreComment::class)->name('comment.store');
  ```
- > Note: Inside my RouteServiceProvider, I have set my route namespace to 'App\Http\Actions'.
+ > Inside my RouteServiceProvider, I have set my route namespace to 'App\Http\Actions'.
  
 
  **ACTION**
@@ -122,7 +122,8 @@ class StoreComment extends Action
     }
 }
 ```
-> Note, very often, this is as complex as your actions (controllers) will need to be. The action receives the request, passes it to the appropriate service, then gives the service response to the responder to handle as it sees fit. Validation can be handled within the service's validator, which we will show in a moment. If you prefer not to use the service's validation, there's nothing stopping you from validating in your controller or using Laravel's form requests.
+
+> Very often, this is as complex as your actions (controllers) will need to be. The action receives the request, passes it to the appropriate service, then gives the service response to the responder to handle as it sees fit. Validation can be handled within the service's validator, which we will show in a moment. If you prefer not to use the service's validation, there's nothing stopping you from validating in your controller or using Laravel's form requests.
 
 
 **SERVICE**
@@ -188,7 +189,7 @@ To generate a Service validator:
 ```sh
 php artisan asr:validation Comment\\StoreCommentValidationService
 ```
-> Note: the default suffix for validators is "ValidationService". If you prefer another suffix or no suffix at all, a suffix configuration is available.
+> The default suffix for validators is "ValidationService". If you prefer another suffix or no suffix at all, a suffix configuration is available.
 
 **Responder**
 
@@ -225,7 +226,6 @@ class StoreCommentResponder extends Responder
     }
 }
 ```
-> Any logic that determines how the data is sent back to the user should be handled in the Responder class, with the ```respond``` method sending the response. Since the Responder implements Laravel's Responsable interface, you may return the responder object directly from your controller method and the ```respond``` method will be called automatically. eg. ```return $this->responder;``` or ```return $this->responder->withPayload($data);```.
 
 ### Queued Services
 Services may also be queued. In order to do this, you have a couple of options:
@@ -238,18 +238,18 @@ Services may also be queued. In order to do this, you have a couple of options:
 
 
 ## Taking it further with automation
-> Note: Automatic services are still experimental.
+> Automatic services are still experimental.
 
 ### When to use automatically run services
 - If you are in the context of an http request
 - If your service is expecting the current request's parameters
 - If there is a result returned from your service.
 
-> Note: If the service has a validator defined, the data will be validated before running the service logic.
+> If the service has a validator defined, the data will be validated before running the service logic.
 
-> Note: See example below: If you use the autorun functionality and do not use the action's service parameter inside the action(eg. when queueing your service), your IDE will likely yell at you (see example below). I would only use 'autorun' if you are expecting a return value from the service. Also, If you choose to use autorun when queueing your service, be sure the service implements the ShouldQueueService interface.
+> If you use the autorun functionality and do not use the action's service parameter inside the action(eg. when queueing your service), your IDE will likely yell at you (see example below). I would only use 'autorun' if you are expecting a return value from the service. Also, If you choose to use autorun when queueing your service, be sure the service implements the ShouldQueueService interface.
 
-> Note on generating actions with an autorun service: When running the asr:action command, add the --auto-service option to have the Service added to your scaffolded Action class.
+> When running the asr:action command, add the --auto-service option to have the Service added to your scaffolded Action class.
 
 ```php
 // StoreComment.php
