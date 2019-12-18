@@ -2,7 +2,7 @@
 ### An Actions/Service/Responder implementation for Laravel.
 
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
-[![Latest Stable Version](https://poser.pugx.org/perfect-oblivion/action-service-responder/v/stable)](https://packagist.org/packages/perfect-oblivion/action-service-responder)
+[![Latest Stable Version](https://poser.pugx.org/perfect-oblivion/action-service-responder/v/stable)](https://github.com/perfect-oblivion/action-service-responder)
 [![Unit Tests](https://github.com/perfect-oblivion/action-service-responder/workflows/Tests%20(PHP)/badge.svg)](https://github.com/perfect-oblivion/action-service-responder)
 [![composer.lock](https://poser.pugx.org/perfect-oblivion/action-service-responder/composerlock)](https://github.com/perfect-oblivion/action-service-responder)
 
