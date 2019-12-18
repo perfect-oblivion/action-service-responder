@@ -226,12 +226,9 @@ Services may also be queued. In order to do this, you have a couple of options:
 - The service may implement the ShouldQueueService interface.
 - Instead of using the ```call``` method from your controller, you may use the ```queue``` method.
 
-<blockquote>
-Note on queued services:
-
-- Data will not be returned to the controller form a queued service.
-- If you need to customize the queue name, connection name, or delay, use public properties on the Service class.
-</blockquote>
+|Note on queued services|
+|-----------------------|
+|(1) Data will not be returned to the controller form a queued service<br>(2) If you need to customize the queue name, connection name, or delay, use public properties on the Service class
 
 
 ## Taking it further with automation
