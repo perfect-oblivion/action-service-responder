@@ -290,10 +290,10 @@ You may also use the following methods:
   - Inject the ServiceCaller in your controller:
   ```$this->caller->call(MyService::class, $params);```
   - Inject the service via constructor injection, then call the "run" method directly:
-  ```$this->service->run($params);
+  ```$this->service->run($params);```
 
-> Note: If you choose to inject the service via constructor injection, you will need to set a public property($autorunIfEnabled = false) on your service.
-If you don't plan to use 'autorun' for any of your services, you may set the package configuration option 'service_autorun' to false.
+> If you choose to inject the service via constructor injection, you will need to set a public property($autorunIfEnabled = false) on your service.
+> If you don't plan to use 'autorun' for any of your services, you may set the package configuration option 'service_autorun' to false.
 
 ## Testing
 
