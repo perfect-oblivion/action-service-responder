@@ -28,7 +28,6 @@ class SimpleResponderWithCustomRequestAction extends Action
      */
     public function __invoke(CustomRequest $request): string
     {
-        dump('instance of: ', get_class($request));
         return $this->responder->withRequest($request)->respond();
     }
 }

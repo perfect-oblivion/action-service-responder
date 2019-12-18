@@ -21,7 +21,6 @@ class TestNoAutorunService extends Service
      */
     public function run(array $parameters)
     {
-        dump('running');
         return $parameters;
     }
 }
