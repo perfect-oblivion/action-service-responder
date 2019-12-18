@@ -1,12 +1,12 @@
 # Perfect Oblivion - ActionServiceResponder
 ### An Actions/Service/Responder implementation for Laravel.
 
+[![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 [![Latest Stable Version](https://poser.pugx.org/perfect-oblivion/action-service-responder/v/stable)](https://packagist.org/packages/perfect-oblivion/action-service-responder)
-[![Build Status](https://img.shields.io/travis/perfect-oblivion/action-service-responder/master.svg)](https://travis-ci.org/perfect-oblivion/action-service-responder)
-[![Quality Score](https://img.shields.io/scrutinizer/g/perfect-oblivion/action-service-responder.svg)](https://scrutinizer-ci.com/g/perfect-oblivion/action-service-responder)
-[![Total Downloads](https://poser.pugx.org/perfect-oblivion/action-service-responder/downloads)](https://packagist.org/packages/perfect-oblivion/action-service-responder)
+[![Unit Tests](https://github.com/perfect-oblivion/action-service-responder/workflows/Tests%20(PHP)/badge.svg)](https://github.com/perfect-oblivion/action-service-responder)
+[![composer.lock](https://poser.pugx.org/perfect-oblivion/action-service-responder/composerlock)](https://github.com/perfect-oblivion/action-service-responder)
 
-![Perfect Oblivion](https://s3.us-east-2.amazonaws.com/perfect-oblivion/bc_large.png "Perfect Oblivion")
+![Perfect Oblivion](https://res.cloudinary.com/phpstage/image/upload/v1554128207/img/Oblivion.png "Perfect Oblivion")
 
 ### Disclaimer
 The packages under the PerfectOblivion namespace are basically a way for me to avoid copy/pasting simple functionality that I like in all of my projects. There's nothing groundbreaking here, just a little extra functionality for form requests, controllers, custom rules, services, etc.
