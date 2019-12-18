@@ -23,10 +23,6 @@ You can install the package via composer. From your project directory, in your t
 ```bash
 composer require perfect-oblivion/action-service-responder
 ```
-> Until version 1.0 is released, major features and bug fixes may be added between minor versions. To maintain stability, I recommend a restraint in the form of "0.0.*". This would take the form of:
-```bash
-composer require "perfect-oblivion/action-service-responder:0.0.*"
-```
 
 The ServiceProvider will be automtically detected and registered.
 If you have this functionality disabled, you may manually add the package service provider to your config/app.php file, in the 'providers' array:
@@ -42,21 +38,20 @@ If you have this functionality disabled, you may manually add the package servic
 The package comes with some default settings configured. If you would like to tweak these settings, such as namespaces, command names, etc., run the command below in your terminal.
 
 ```bash
-php artisan vendor:publish
+php artisan vendor:publish --provider="PerfectOblivion\ActionServiceResponder\ActionServiceResponderProvider"
 ```
-then choose the PerfectOblivion\ActionServiceResponder\ActionServiceResponderProvider option.
 
-This will copy the asr.php configuration file to your config folder.
+This will copy the ```asr.php``` configuration file to your app's config folder.
 
 ## Usage
 In my opinion, the benefits of ASR has over traditional MVC, is clarity, narrow class responsibility, fewer dependencies, and overall organization.
 
 In my example-case below, I'll use all three components(Action, Service and Responder) along with the service validator. If you prefer, you can choose to mix and match, using only the components you need.
 
- ### Case: User submits a comment to a message board.
+ ### CASE: USER SUBMITS A COMMENT TO A MESSAGE BOARD
  
 
- **ROUTES**
+ ### Routes
 
  ```php
  <?php
@@ -67,7 +62,7 @@ Route::post('comment', Comment\StoreComment::class)->name('comment.store');
  > Inside my RouteServiceProvider, I have set my route namespace to 'App\Http\Actions'.
  
 
- **ACTION**
+ ### Actions
 
  To generate an action, you may use the provided artisan command:
 
@@ -123,10 +118,16 @@ class StoreComment extends Action
 }
 ```
 
-> Very often, this is as complex as your actions (controllers) will need to be. The action receives the request, passes it to the appropriate service, then gives the service response to the responder to handle as it sees fit. Validation can be handled within the service's validator, which we will show in a moment. If you prefer not to use the service's validation, there's nothing stopping you from validating in your controller or using Laravel's form requests.
+Very often, this is as complex as your actions (controllers) will need to be. 
+
+1. The action receives the request.
+2. The data from the request is passed to the appropriate service.
+3. The return value of the Service call is given to the responder to handle as it sees fit.
+
+> Validation can be handled within the service's validator, which we will show in a moment([see Service Validators](#service-validators)). If you prefer not to use the service's validation, there's nothing stopping you from validating in your controller or using Laravel's form requests.
 
 
-**SERVICE**
+### Services
 
  To generate a service, you may use the provided artisan command:
 
@@ -175,16 +176,16 @@ class StoreCommentService extends Service
 
 **There are a few things going on here. We'll start with the validator.**
 
-I'll show below how to generate a validator. A validator may be injected via the service's constructor. The validator will run automatically, and the validated data will be available via the service's 'data' property. 
+1. A validator is injected via the service's constructor. The validator will run automatically, and the validated data will be available via the service's ```data``` property. 
 
-You can manually run the validator if you call the service directly through it's 'run' method, by calling ```$validator->validate($parameters)```. This method will return the validated data so that it can continue to be used in the service.
+> If you need to manually run the validator, you'll need to instantiate your service and call the ```run``` method directly. See [Alternative ways to call services](#alternative-ways-to-call-services)
 
 > If validation fails, it will perform as Laravel's form requests do and throw an exception, which by default will redirect and inject the validation errors in the $errors object that is available in the view. In the case of an ajax request, a 422 will be returned along with the validation errors in a json object. This functionality can be customized in the same manner as form requests.
 
 Any dependencies required by the Service may be injected via the Service constructor.
 
 
-To generate a Service validator:
+### Service Validators
 
 ```sh
 php artisan asr:validation Comment\\StoreCommentValidationService
@@ -280,16 +281,12 @@ public function __invoke(StorePostService $service, Request $request)
 ```
 
 ### Alternative ways to call services
-Along with the above mentioned techniques for calling a service:
-  - MyService::call($params);
-  - Autorun via method injection
-
-You may also use the following methods:
-  - Using the "CallsServices" trait in your controller:
+In addition to the methods discussed above, you may call services by:
+1. Using the "CallsServices" trait in your controller:
   ```$this->call(MyService::class, $params);```
-  - Inject the ServiceCaller in your controller:
+2. Inject the ServiceCaller in your controller:
   ```$this->caller->call(MyService::class, $params);```
-  - Inject the service via constructor injection, then call the "run" method directly:
+3. Inject the service via constructor injection, then call the "run" method directly:
   ```$this->service->run($params);```
 
 > If you choose to inject the service via constructor injection, you will need to set a public property($autorunIfEnabled = false) on your service.
@@ -312,10 +309,6 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 ## Security
 
 If you discover any security related issues, please email clay@phpstage.com instead of using the issue tracker.
-
-## Roadmap
-
-We plan to work on flexibility/configuration soon, as well as release a framework agnostic version of the package.
 
 ## Credits
 
