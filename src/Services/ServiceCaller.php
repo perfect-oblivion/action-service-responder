@@ -2,7 +2,6 @@
 
 namespace PerfectOblivion\ActionServiceResponder\Services;
 
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use PerfectOblivion\ActionServiceResponder\Services\Service;
 use PerfectOblivion\ActionServiceResponder\Services\Contracts\ShouldQueueService;
@@ -20,11 +19,11 @@ class ServiceCaller extends AbstractServiceCaller
      */
     public function call($service, $params)
     {
-        $service::$autoRun = false;
-
         if (! $this->hasHandler($service)) {
             throw ServiceHandlerMethodException::notFound($service);
         }
+
+        $this->temporarilyDisableAutorun();
 
         $resolved = $this->container->make($service);
         $this->callValidator($resolved, $params);
@@ -48,13 +47,13 @@ class ServiceCaller extends AbstractServiceCaller
      */
     public function queue($service, $params)
     {
-        $service::$autoRun = false;
-
         if (! $this->hasHandler($service)) {
             throw ServiceHandlerMethodException::notFound($service);
         }
 
-        $resolved = Container::getInstance()->make($service);
+        $this->temporarilyDisableAutorun();
+
+        $resolved = $this->container->make($service);
         $this->callValidator($resolved, $params);
 
         return resolve(Dispatcher::class)->dispatch(new QueuedService($resolved, $params));
@@ -74,5 +73,15 @@ class ServiceCaller extends AbstractServiceCaller
             $service->setData($validator->validate($params));
             $service->setIsValidated(true);
         }
+    }
+
+    /**
+     * Temporarily disable the service autorun.
+     */
+    private function temporarilyDisableAutorun(): void
+    {
+        $this->container->resolving(Service::class, function($service, $app) {
+            $service->autorunIfEnabled = false;
+        });
     }
 }

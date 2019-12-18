@@ -18,12 +18,12 @@ abstract class Service
     protected $validated = false;
 
     /** @var bool */
-    public static $autoRun = true;
+    public $autorunIfEnabled = true;
 
     /**
      * Automatically run the service
      */
-    public function autoRun(): void
+    public function autorun(): void
     {
         if ($this instanceof ShouldQueueService) {
             $this->autoQueue();

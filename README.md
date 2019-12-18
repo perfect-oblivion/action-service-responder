@@ -236,7 +236,7 @@ If you need to customize the queue name, connection name, or delay, use public p
 
 > Note: If the service has a validator defined, the data will be validated before running the service logic.
 
-> Note: See example below: If you use the autorun functionality and do not use the action's service parameter inside the action, your IDE will likely yell at you. I would only use 'autorun' if you are expecting a return value from the service.
+> Note: See example below: If you use the autorun functionality and do not use the action's service parameter inside the action(eg. when queueing your service), your IDE will likely yell at you (see example below). I would only use 'autorun' if you are expecting a return value from the service. If you choose to use autorun when queueing your service, be sure the service implements the ShouldQueueService interface.
 
 ```php
 // StoreComment.php
@@ -247,11 +247,9 @@ public function __invoke(StoreCommentService $service, Request $request)
 ```
 
 ### How To
-  - In your service configuration, set 'autorun' to true.
+  - In your package configuration, set 'service_autorun' to true (default).
   - Typehint the service on your controller method.
   - If the service has a return value, it can be accessed via the $result property of the service.
-
-> Note: When using the autorun functionality, if the service should be queued, be sure the service class implements the ShouldQueueService interface.
 
 ```php
 // StorePost.php
@@ -263,7 +261,7 @@ public function __invoke(StorePostService $service, Request $request)
     // the result of the service is available as $service->result.
     dump($service->result);
 
-    //If using Responders, you may pass the $service object to the responder. The responder knows to retrieve the $result property.
+    //If using Responders and an autorun Service, you may pass the $service object to the responder. The responder knows to retrieve the $result property.
     return $this->responder->withPayload($service)->respond();
 }
 ```
@@ -281,7 +279,8 @@ You may also use the following methods:
   - Inject the service via constructor injection, then call the "run" method directly:
   ```$this->service->run($params);
 
-> Note: If you inject the service via constructor injection, you will need to set a public static property($autoRun = false) on your service.
+> Note: If you choose to inject the service via constructor injection, you will need to set a public property($autorunIfEnabled = false) on your service.
+If you don't plan to use 'autorun' for any of your services, you may set the package configuration option 'service_autorun' to false.
 
 ## Testing
 
