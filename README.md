@@ -53,6 +53,7 @@ In my opinion, one benefit ASR has over the traditional MVC style, is clarity, t
  ### Case: User submits a comment to a message board.
 
  **ROUTES**
+
  ```php
  <?php
 // web.php
@@ -62,13 +63,13 @@ Route::post('comment', Comment\StoreComment::class)->name('comment.store');
  > Note: Inside my RouteServiceProvider, I have set my route namespace to 'App\Http\Actions'.
 
  **ACTION**
+
  To generate an action, you may use the provided artisan command:
 
 ```sh
 php artisan asr:action Comment\\StoreComment
 ```
 An Action will be generated at *App\Http\Actions\Comment\StoreComment*.
-> Note: Regarding auto-run services(see "Taking it further with automation" below), if you are using "autorun" services, adding the "--auto-service" option to the action generator command, will add the service use-statement, type-hint and doc-block parameter to the generated action.
 
 I've edited the action to show how I would set this it up for our Comment example.
 
@@ -98,7 +99,7 @@ class StoreComment extends Action
      *
      * @param  \App\Http\Responders\Comment\StoreCommentResponder  $responder
      */
-    public function __construct(Responder $responder)
+    public function __construct(StoreCommentResponder $responder)
     {
         $this->responder = $responder;
     }
@@ -120,6 +121,7 @@ class StoreComment extends Action
 > Note, very often, this is as complicated as your actions (controllers) will need to be. The action receives the request, passes it to the appropriate service, then gives the service response to the responder to handle as it sees fit. Validation can be handled within the service's validator, which we will show in a moment. If you prefer not to use the service's validation, there's nothing stopping you from validating in your controller or using Laravel's form requests.
 
 **SERVICE**
+
  To generate a service, you may use the provided artisan command:
 
 ```sh
@@ -181,6 +183,7 @@ php artisan asr:validation Comment\\StoreCommentValidationService
 > Note: the default suffix for these validators is "ValidationService". If you prefer another suffix or no suffix at all, a suffix configuration is available.
 
 **Responder**
+
 Finally, the responder will handle sending the response. If data needs to be sent to the responder, you can use the ```withPayload``` method.  Responders implement Laravel's Responsable interface, so you may return the Responder directly without calling ```respond``` if you prefer. Also, the Responder has access to the current request through the $request property. If you need to pass a custom request to the Responder, eg. a custom FormRequest class, you may use the ```withRequest``` method.
 ```php
 // StoreComment.php
@@ -237,6 +240,8 @@ If you need to customize the queue name, connection name, or delay, use public p
 > Note: If the service has a validator defined, the data will be validated before running the service logic.
 
 > Note: See example below: If you use the autorun functionality and do not use the action's service parameter inside the action(eg. when queueing your service), your IDE will likely yell at you (see example below). I would only use 'autorun' if you are expecting a return value from the service. If you choose to use autorun when queueing your service, be sure the service implements the ShouldQueueService interface.
+
+> Note on generating actions with an autorun service: When running the asr:action command, add the --auto-service option to have the Service added to your scaffolded Action class.
 
 ```php
 // StoreComment.php
