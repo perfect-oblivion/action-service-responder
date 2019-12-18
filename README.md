@@ -69,7 +69,8 @@ Route::post('comment', Comment\StoreComment::class)->name('comment.store');
 ```sh
 php artisan asr:action Comment\\StoreComment
 ```
-An Action will be generated at *App\Http\Actions\Comment\StoreComment*.
+When using autorun Services, you can add the --auto-service option to have the Service added to your scaffolded Action class. See [autorun Services below](#taking-it-further-with-automation) for more information.
+
 
 I've edited the action to show how I would set this it up for our Comment example.
 
@@ -174,13 +175,13 @@ class StoreCommentService extends Service
 }
 ```
 
-1. A validator is injected via the service's constructor. The validator will run automatically, and the validated data will be available via the service's ```data``` property. 
+1. A validator is injected via the service's constructor. The validator will run automatically, and the validated data will be available via the service's ```$data``` property. 
 
 > If you need to manually run the validator, you'll need to instantiate your service and call the ```run``` method directly. See [Alternative ways to call services](#alternative-ways-to-call-services)
-> If validation fails, it will perform as Laravel's form requests do and throw an exception, which by default will redirect and inject the validation errors in the $errors object that is available in the view. In the case of an ajax request, a 422 will be returned along with the validation errors in a json object. This functionality can be customized in the same manner as form requests.
+> If validation fails, it will behave like Laravel's form requests and throw an ValidationException. The exception will redirect and inject the validation errors in the global $errors object that is available to the view. In the case of an ajax request, a 422 will be returned along with the validation errors in a json object. This functionality can be customized in the same manner as form requests.
 
 2. Any dependencies required by the Service may be injected via the Service constructor.
-3. The parameters from the Service call are passed to the ```run``` method. Within this method, you may work with those passed parameters or, if validation is used, you'll have access to the validated data via the Service's ```$data``` property.
+3. The parameters from the Service call are passed to the ```run``` method. Within this method, you may work with those parameters or, if validation is used, you'll have access to the validated data via the Service's ```$data``` property.
 
 
 ### Service Validators
@@ -190,9 +191,14 @@ php artisan asr:validation Comment\\StoreCommentValidationService
 ```
 > The default suffix for validators is "ValidationService". If you prefer another suffix or no suffix at all, a suffix configuration is available.
 
-**Responder**
+### Responders
 
-Finally, the responder will handle sending the response. If data needs to be sent to the responder, you may use the ```withPayload``` method.  Responders implement Laravel's Responsable interface, so you may return the Responder directly without calling ```respond``` if you prefer. Also, the Responder has access to the current request through the $request property. If you need to pass a custom request to the Responder, eg. a custom FormRequest class, you may use the ```withRequest``` method.
+Finally, the responder will handle sending the response.
+
+1. If data needs to be sent to the responder, you may use the ```withPayload``` method.
+2. Responders implement Laravel's Responsable interface, so you may return the Responder directly without calling ```respond```.
+3. Responders have access to the current request through the $request property. If you need to pass a custom request to the Responder, you may use the ```withRequest``` method.
+
 ```php
 // StoreComment.php
 public function __invoke(MyCustomRequest $request)
@@ -228,8 +234,8 @@ class StoreCommentResponder extends Responder
 
 ### Queued Services
 Services may also be queued. In order to do this, you have a couple of options:
-- The service may implement the ShouldQueueService interface.
-- Instead of using the ```call``` method from your controller, you may use the ```queue``` method.
+1. The service may implement the ShouldQueueService interface.
+2. Instead of using the ```call``` method from your controller, you may use the ```queue``` method.
 
 |Note on queued services|
 |-----------------------|
@@ -240,22 +246,17 @@ Services may also be queued. In order to do this, you have a couple of options:
 > Automatic services are still experimental.
 
 ### When to use automatically run services
-- If you are in the context of an http request
-- If your service is expecting the current request's parameters
-- If there is a result returned from your service.
+- If you are in the context of an http request and your Service returns a value.
 
+> When using autorun, the current request data will be passed to the Service automatically.
 > If the service has a validator defined, the data will be validated before running the service logic.
 
-> If you use the autorun functionality and do not use the action's service parameter inside the action(eg. when queueing your service), your IDE will likely yell at you (see example below). I would only use 'autorun' if you are expecting a return value from the service. Also, If you choose to use autorun when queueing your service, be sure the service implements the ShouldQueueService interface.
-
-> When running the asr:action command, add the --auto-service option to have the Service added to your scaffolded Action class.
 
 ```php
 // StoreComment.php
 public function __invoke(StoreCommentService $service, Request $request)
 {
-    return view('comments.index'); //because we're not using the $service parameter in the method body, your IDE will notify you that $service is unused.
-}
+    return view('comments.index'); //if you don't use the $service parameter in the method body, your IDE will yell at you. Using autorun is not recommended if your Service doesn't return a value.
 ```
 
 ### How To
