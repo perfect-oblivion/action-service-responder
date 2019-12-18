@@ -23,9 +23,9 @@ You can install the package via composer. From your project directory, in your t
 ```bash
 composer require perfect-oblivion/action-service-responder
 ```
-> Note: Until version 1.0 is released, major features and bug fixes may be added between minor versions. To maintain stability, I recommend a restraint in the form of "0.1.*". This would take the form of:
+> Note: Until version 1.0 is released, major features and bug fixes may be added between minor versions. To maintain stability, I recommend a restraint in the form of "0.0.*". This would take the form of:
 ```bash
-composer require "perfect-oblivion/action-service-responder:0.1.*"
+composer require "perfect-oblivion/action-service-responder:0.0.*"
 ```
 
 The ServiceProvider will be automtically detected and registered.
@@ -49,11 +49,12 @@ then choose the PerfectOblivion\ActionServiceResponder\ActionServiceResponderPro
 This will copy the asr.php configuration file to your config folder.
 
 ## Usage
-In my opinion, one benefit ASR has over the traditional MVC style, is clarity, the narrow class responsibility, fewer dependencies, and overall organization. When all three components are used together, the consistency, integrity, and clarity really shows.
+In my opinion, the benefits of ASR has over traditional MVC, is clarity, narrow class responsibility, fewer dependencies, and overall organization.
 
- In my example-case below, I'll use all three components(Action, Service and Responder) along with the service validator. If you prefer, you can choose to mix and match, using only the components you need.
+In my example-case below, I'll use all three components(Action, Service and Responder) along with the service validator. If you prefer, you can choose to mix and match, using only the components you need.
 
  ### Case: User submits a comment to a message board.
+ 
 
  **ROUTES**
 
@@ -64,6 +65,7 @@ In my opinion, one benefit ASR has over the traditional MVC style, is clarity, t
 Route::post('comment', Comment\StoreComment::class)->name('comment.store');
  ```
  > Note: Inside my RouteServiceProvider, I have set my route namespace to 'App\Http\Actions'.
+ 
 
  **ACTION**
 
@@ -122,6 +124,7 @@ class StoreComment extends Action
 ```
 > Note, very often, this is as complex as your actions (controllers) will need to be. The action receives the request, passes it to the appropriate service, then gives the service response to the responder to handle as it sees fit. Validation can be handled within the service's validator, which we will show in a moment. If you prefer not to use the service's validation, there's nothing stopping you from validating in your controller or using Laravel's form requests.
 
+
 **SERVICE**
 
  To generate a service, you may use the provided artisan command:
@@ -171,13 +174,16 @@ class StoreCommentService extends Service
 
 **There are a few things going on here. We'll start with the validator.**
 
-I'll show below how to generate a validator. If you have data that needs to be validated, you may inject the validator via the service's constructor. The validator will run automatically if it is injected, and the validated data will be available via the service's 'data' property. If you would like to manually run the validator, you'll need to call the service directly through it's 'run' method. Then, inside 'run', you may call the validator's 'validate' method, passing the $parameters. This method will return the validated data so that it can continue to be used in the service.
+I'll show below how to generate a validator. A validator may be injected via the service's constructor. The validator will run automatically, and the validated data will be available via the service's 'data' property. 
 
-If validation fails, it will perform as Laravel's form requests do and throw an exception, which by default will redirect and inject the validation errors in the $errors object that is available in the view. In the case of an ajax request, a 422 will be returned along with the validation errors in a json object. This functionality can be customized in the same manner as form requests.
+You can manually run the validator if you call the service directly through it's 'run' method, by calling ```$validator->validate($parameters)```. This method will return the validated data so that it can continue to be used in the service.
 
-> Note: Any necessary dependencies may be injected via the Service's constructor.
+> If validation fails, it will perform as Laravel's form requests do and throw an exception, which by default will redirect and inject the validation errors in the $errors object that is available in the view. In the case of an ajax request, a 422 will be returned along with the validation errors in a json object. This functionality can be customized in the same manner as form requests.
 
-If a service needs to validate data, a validator may be generated using the following command:
+Any dependencies required by the Service may be injected via the Service constructor.
+
+
+To generate a Service validator:
 
 ```sh
 php artisan asr:validation Comment\\StoreCommentValidationService
@@ -219,7 +225,7 @@ class StoreCommentResponder extends Responder
     }
 }
 ```
-> Note: Any logic that determines how the data is sent back to the user may be handled here, in the ```respond``` method. If the responder is the end of the request/response chain, meaning you're not handing over control to another library or class to handle the response, you may return the responder object directly from your controller method and the "respond" method will be called automatically. eg. ```return $this->responder;``` or ```return $this->responder->withPayload($data);```.
+> Any logic that determines how the data is sent back to the user should be handled in the Responder class, with the ```respond``` method sending the response. Since the Responder implements Laravel's Responsable interface, you may return the responder object directly from your controller method and the ```respond``` method will be called automatically. eg. ```return $this->responder;``` or ```return $this->responder->withPayload($data);```.
 
 ### Queued Services
 Services may also be queued. In order to do this, you have a couple of options:
