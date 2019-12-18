@@ -13,7 +13,10 @@ The packages under the PerfectOblivion namespace are basically a way for me to a
 
 The general idea for this package is based on [ADR - Action Domain Responder](http://paul-m-jones.com/archives/5970), by [Paul M. Jones](https://twitter.com/pmjones).
 
-There are 3 basic components of this pattern. Actions, more commonly called Controllers throughout the PHP ecosystem, Services, classes that handle calculation and implementation which is specific to your domain, and Responders which are responsible for handing the data back to the consumer.
+There are 3 basic components of this pattern.
+- Actions: more commonly called Controllers throughout the PHP ecosystem
+- Services: handle calculation and logic specific to your domain
+- Responders: responsible for handing data back to the consumer
 
 ## Installation
 You can install the package via composer. From your project directory, in your terminal, enter:
@@ -41,7 +44,7 @@ The package comes with some default settings configured. If you would like to tw
 ```bash
 php artisan vendor:publish
 ```
-and choose the PerfectOblivion\ActionServiceResponder\ActionServiceResponderProvider option.
+then choose the PerfectOblivion\ActionServiceResponder\ActionServiceResponderProvider option.
 
 This will copy the asr.php configuration file to your config folder.
 
@@ -107,18 +110,17 @@ class StoreComment extends Action
     /**
      * Store a new comment from the request for the given post.
      *
-     * @param  \App\Models\Post  $post
      * @param  \Illuminate\Http\Request  $request
      */
-    public function __invoke(Post $post, Request $request): Response
+    public function __invoke(Request $request): Response
     {
-        $data = StoreCommentService::call($post, $request->only(['body']));
+        $data = StoreCommentService::call($request->only(['body']));
 
         return $this->responder->withPayload($data)->respond();
     }
 }
 ```
-> Note, very often, this is as complicated as your actions (controllers) will need to be. The action receives the request, passes it to the appropriate service, then gives the service response to the responder to handle as it sees fit. Validation can be handled within the service's validator, which we will show in a moment. If you prefer not to use the service's validation, there's nothing stopping you from validating in your controller or using Laravel's form requests.
+> Note, very often, this is as complex as your actions (controllers) will need to be. The action receives the request, passes it to the appropriate service, then gives the service response to the responder to handle as it sees fit. Validation can be handled within the service's validator, which we will show in a moment. If you prefer not to use the service's validation, there's nothing stopping you from validating in your controller or using Laravel's form requests.
 
 **SERVICE**
 
@@ -156,40 +158,40 @@ class StoreCommentService extends Service
     /**
      * Handle the call to the service.
      *
-     * @param  array  $data
+     * @param  array  $parameters
      *
      * @return mixed
      */
-    public function run(array $data)
+    public function run(array $parameters)
     {
-        return $this->doSomeWork($this->validatedData); // see notes below
+        return $this->doSomeWork($this->data); // see notes below
     }
 }
 ```
 
 > Note: There are a few things going on here. We'll start with the validator.
 
-I'll show below how to generate a validator. If you have data that needs to be validated, you can inject the validator via the service's constructor. The validator will run automatically if it is injected, and the validated data will be available via the 'validatedData' property. If you would like to manually run the validator, you'll need to call the service directly through it's 'run' method. Then, inside 'run', you can call the validator's 'validate' method, passing the $data parameter. This method will return the validated data so that it can continue to be used in the service.
+I'll show below how to generate a validator. If you have data that needs to be validated, you may inject the validator via the service's constructor. The validator will run automatically if it is injected, and the validated data will be available via the service's 'data' property. If you would like to manually run the validator, you'll need to call the service directly through it's 'run' method. Then, inside 'run', you may call the validator's 'validate' method, passing the $parameters. This method will return the validated data so that it can continue to be used in the service.
 
 If validation fails, it will perform as Laravel's form requests do and throw an exception, which by default will redirect and inject the validation errors in the $errors object that is available in the view. In the case of an ajax request, a 422 will be returned along with the validation errors in a json object. This functionality can be customized in the same manner as form requests.
 
 > Note: Any necessary dependencies may be injected via the Service's constructor.
 
-If a service needs to validate data, a validator can be generated using the following command:
+If a service needs to validate data, a validator may be generated using the following command:
 
 ```sh
 php artisan asr:validation Comment\\StoreCommentValidationService
 ```
-> Note: the default suffix for these validators is "ValidationService". If you prefer another suffix or no suffix at all, a suffix configuration is available.
+> Note: the default suffix for validators is "ValidationService". If you prefer another suffix or no suffix at all, a suffix configuration is available.
 
 **Responder**
 
-Finally, the responder will handle sending the response. If data needs to be sent to the responder, you can use the ```withPayload``` method.  Responders implement Laravel's Responsable interface, so you may return the Responder directly without calling ```respond``` if you prefer. Also, the Responder has access to the current request through the $request property. If you need to pass a custom request to the Responder, eg. a custom FormRequest class, you may use the ```withRequest``` method.
+Finally, the responder will handle sending the response. If data needs to be sent to the responder, you may use the ```withPayload``` method.  Responders implement Laravel's Responsable interface, so you may return the Responder directly without calling ```respond``` if you prefer. Also, the Responder has access to the current request through the $request property. If you need to pass a custom request to the Responder, eg. a custom FormRequest class, you may use the ```withRequest``` method.
 ```php
 // StoreComment.php
-public function __invoke(Post $post, MyCustomRequest $request)
+public function __invoke(MyCustomRequest $request)
 {
-    $data = StoreCommentService::call($post, $request->all());
+    $data = StoreCommentService::call($request->all());
 
     return $this->responder->withPayload($data)->withRequest($request)->respond();
 }
@@ -217,7 +219,7 @@ class StoreCommentResponder extends Responder
     }
 }
 ```
-> Note: Any logic that determines how the data is sent back to the user can be handled here, in the ```respond``` method. If the responder is the end of the request/response chain, meaning you're not handing over control to another library or class to handle the response, you can return the responder object directly from your controller method and the "respond" method will be called automatically. eg. ```return $this->responder;``` or ```return $this->responder->withPayload($data);```.
+> Note: Any logic that determines how the data is sent back to the user may be handled here, in the ```respond``` method. If the responder is the end of the request/response chain, meaning you're not handing over control to another library or class to handle the response, you may return the responder object directly from your controller method and the "respond" method will be called automatically. eg. ```return $this->responder;``` or ```return $this->responder->withPayload($data);```.
 
 ### Queued Services
 Services may also be queued. In order to do this, you have a couple of options:
@@ -239,7 +241,7 @@ If you need to customize the queue name, connection name, or delay, use public p
 
 > Note: If the service has a validator defined, the data will be validated before running the service logic.
 
-> Note: See example below: If you use the autorun functionality and do not use the action's service parameter inside the action(eg. when queueing your service), your IDE will likely yell at you (see example below). I would only use 'autorun' if you are expecting a return value from the service. If you choose to use autorun when queueing your service, be sure the service implements the ShouldQueueService interface.
+> Note: See example below: If you use the autorun functionality and do not use the action's service parameter inside the action(eg. when queueing your service), your IDE will likely yell at you (see example below). I would only use 'autorun' if you are expecting a return value from the service. Also, If you choose to use autorun when queueing your service, be sure the service implements the ShouldQueueService interface.
 
 > Note on generating actions with an autorun service: When running the asr:action command, add the --auto-service option to have the Service added to your scaffolded Action class.
 
