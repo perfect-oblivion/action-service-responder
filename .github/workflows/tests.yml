@@ -1,6 +1,6 @@
 name: Tests (PHP)
 
-on: [push]
+on: [pull_request]
 
 jobs:
   tests:
@@ -24,10 +24,3 @@ jobs:
         run: ./vendor/bin/phpunit
         env:
           APP_ENV: testing
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@master
-        if: failure()
-        with:
-          name: Logs
-          path: ./storage/logs
