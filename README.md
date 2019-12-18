@@ -174,15 +174,13 @@ class StoreCommentService extends Service
 }
 ```
 
-**There are a few things going on here. We'll start with the validator.**
-
 1. A validator is injected via the service's constructor. The validator will run automatically, and the validated data will be available via the service's ```data``` property. 
 
 > If you need to manually run the validator, you'll need to instantiate your service and call the ```run``` method directly. See [Alternative ways to call services](#alternative-ways-to-call-services)
-
 > If validation fails, it will perform as Laravel's form requests do and throw an exception, which by default will redirect and inject the validation errors in the $errors object that is available in the view. In the case of an ajax request, a 422 will be returned along with the validation errors in a json object. This functionality can be customized in the same manner as form requests.
 
-Any dependencies required by the Service may be injected via the Service constructor.
+2. Any dependencies required by the Service may be injected via the Service constructor.
+3. The parameters from the Service call are passed to the ```run``` method. Within this method, you may work with those passed parameters or, if validation is used, you'll have access to the validated data via the Service's ```$data``` property.
 
 
 ### Service Validators
