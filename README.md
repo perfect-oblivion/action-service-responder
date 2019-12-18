@@ -268,8 +268,8 @@ public function __invoke(StorePostService $service, Request $request)
     // the result of the service is available as $service->result.
     dump($service->result);
 
-    //If using Responders and an autorun Service, you may pass the $service object to the responder. The responder knows to retrieve the $result property.
-    return $this->responder->withPayload($service)->respond();
+    //If using Responders and an autorun Service, you may pass the $service object to the responder via the 'withPayloadFrom' method. The responder knows to retrieve the $result property.
+    return $this->responder->withPayloadFrom($service)->respond();
 }
 ```
 
