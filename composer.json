@@ -26,7 +26,8 @@
         "laravel/framework": "5.8.*|^6.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^8.0"
+        "phpunit/phpunit": "^8.0",
+        "orchestra/testbench": "^4.4"
     },
     "autoload": {
         "psr-4": {
@@ -36,10 +37,14 @@
     "autoload-dev": {
         "psr-4": {
             "PerfectOblivion\\ActionServiceResponder\\Tests\\": "tests"
-        }
+        },
+        "classmap": [
+            "tests/Stubs/routes/actions.php"
+        ]
     },
     "scripts": {
         "test": "vendor/bin/phpunit",
+        "test-f": "vendor/bin/phpunit --filter",
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
     },
     "config": {

@@ -161,12 +161,12 @@ class ActionServiceResponderProvider extends BaseServiceProvider
      */
     private function afterResolvingService(): void
     {
-        if ($this->runningInHttpContext() && $this->shouldAutorunServices()) {
+        if (($this->runningInHttpContext() || $this->app->environment() === 'testing')) {
             $this->app->afterResolving(Service::class, function ($service) {
-                if ($service::$autoRun) {
+                if ($service->autorunIfEnabled && $this->shouldAutorunServices()) {
                     $validator = $service->getValidator();
                     $validator ? $service->setValidatedData($validator->validate($validator->data)) : $service->setData(resolve('request')->all());
-                    $service->autoRun();
+                    $service->autorun();
                 }
             });
         }
