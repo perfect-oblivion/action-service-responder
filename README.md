@@ -169,7 +169,7 @@ class StoreCommentService extends Service
 }
 ```
 
-> Note: There are a few things going on here. We'll start with the validator.
+**There are a few things going on here. We'll start with the validator.**
 
 I'll show below how to generate a validator. If you have data that needs to be validated, you may inject the validator via the service's constructor. The validator will run automatically if it is injected, and the validated data will be available via the service's 'data' property. If you would like to manually run the validator, you'll need to call the service directly through it's 'run' method. Then, inside 'run', you may call the validator's 'validate' method, passing the $parameters. This method will return the validated data so that it can continue to be used in the service.
 
@@ -223,12 +223,15 @@ class StoreCommentResponder extends Responder
 
 ### Queued Services
 Services may also be queued. In order to do this, you have a couple of options:
-(1) The service may implement the ShouldQueueService interface.
-(2) Instead of using the ```call``` method from your controller, you may use the ```queue``` method.
+- The service may implement the ShouldQueueService interface.
+- Instead of using the ```call``` method from your controller, you may use the ```queue``` method.
 
-> Note: Data will not be returned to the controller form a queued service.
+<blockquote>
+Note on queued services:
 
-If you need to customize the queue name, connection name, or delay, use public properties on the Service class.
+- Data will not be returned to the controller form a queued service.
+- If you need to customize the queue name, connection name, or delay, use public properties on the Service class.
+</blockquote>
 
 
 ## Taking it further with automation
