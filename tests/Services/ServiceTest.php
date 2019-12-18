@@ -8,7 +8,7 @@ use PerfectOblivion\ActionServiceResponder\Tests\Stubs\Services\TestServiceWithV
 use PerfectOblivion\ActionServiceResponder\Tests\TestCase;
 use PerfectOblivion\ActionServiceResponder\Services\ServiceCaller;
 
-class CallServiceTest extends TestCase
+class ServiceTest extends TestCase
 {
     /** @test */
     public function calling_service_returns_the_result()
