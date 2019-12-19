@@ -40,6 +40,7 @@ class TestCase extends Orchestra
     private function setPackagePaths(): void
     {
         $this->paths['action'] = Str::replaceFirst('\\', '/', Config::get('asr.action_namespace'));
+        $this->paths['rule'] = Str::replaceFirst('\\', '/', Config::get('asr.custom_rule_namespace'));
         $this->paths['responder'] = Str::replaceFirst('\\', '/', Config::get('asr.responder_namespace'));
         $this->paths['service'] = Str::replaceFirst('\\', '/', Config::get('asr.service_namespace'));
     }

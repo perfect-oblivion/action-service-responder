@@ -3,8 +3,8 @@
 namespace PerfectOblivion\ActionServiceResponder\Tests\Services;
 
 use Illuminate\Validation\ValidationException;
-use PerfectOblivion\ActionServiceResponder\Tests\Stubs\Services\TestService;
-use PerfectOblivion\ActionServiceResponder\Tests\Stubs\Services\TestServiceWithValidation;
+use PerfectOblivion\ActionServiceResponder\Tests\Foundation\Services\TestService;
+use PerfectOblivion\ActionServiceResponder\Tests\Foundation\Services\TestServiceWithValidation;
 use PerfectOblivion\ActionServiceResponder\Tests\TestCase;
 use PerfectOblivion\ActionServiceResponder\Services\ServiceCaller;
 

@@ -39,7 +39,7 @@
             "PerfectOblivion\\ActionServiceResponder\\Tests\\": "tests"
         },
         "classmap": [
-            "tests/Stubs/routes/actions.php"
+            "tests/Foundation/routes/actions.php"
         ]
     },
     "scripts": {

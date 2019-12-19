@@ -11,7 +11,9 @@ class GenerateServiceTest extends TestCase
     /** @test */
     function the_service_command_creates_an_service()
     {
-        $service = app_path($this->paths['service'].'/'.'User/StoreUserService.php');
+        $testStub = str_replace("\r\n", "\n", File::get(__DIR__.'/../stubs/service.stub'));
+
+        $service = app_path($this->paths['service'].'/'.'Sample/SampleService.php');
 
         if (File::exists($service)) {
             unlink($service);
@@ -19,8 +21,9 @@ class GenerateServiceTest extends TestCase
 
         $this->assertFalse(File::exists($service));
 
-        Artisan::call('asr:service User\\\StoreUserService');
+        Artisan::call('asr:service Sample\\\SampleService');
 
         $this->assertTrue(File::exists($service));
+        $this->assertEquals($testStub, str_replace("\r\n", "\n", File::get($service)));
     }
 }

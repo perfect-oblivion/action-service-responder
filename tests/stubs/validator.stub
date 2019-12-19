@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Services\Sample;
+
+use PerfectOblivion\ActionServiceResponder\Validation\ValidationService\ValidationService;
+
+class SampleValidationService extends ValidationService
+{
+    /**
+     * Get the validation rules that apply to the data.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [
+            //
+        ];
+    }
+
+    /**
+     * Get the sanitization filters that apply to the data.
+     *
+     * @return array
+     */
+    public function filters()
+    {
+        return [
+            //
+        ];
+    }
+}
