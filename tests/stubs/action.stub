@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Http\Actions\Sample;
+
+use Illuminate\Http\Request;
+use PerfectOblivion\ActionServiceResponder\Actions\Action;
+
+class ActionSample extends Action
+{
+    /**
+     * Execute the action.
+     *
+     *  @param  \Illuminate\Http\Request  $request
+     */
+    public function __invoke(Request $request)
+    {
+        //
+    }
+}

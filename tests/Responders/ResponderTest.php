@@ -3,7 +3,7 @@
 namespace PerfectOblivion\ActionServiceResponder\Tests\Responders;
 
 use Orchestra\Testbench\Http\Middleware\VerifyCsrfToken;
-use PerfectOblivion\ActionServiceResponder\Tests\Stubs\Requests\CustomRequest;
+use PerfectOblivion\ActionServiceResponder\Tests\Foundation\Requests\CustomRequest;
 use PerfectOblivion\ActionServiceResponder\Tests\TestCase;
 
 class ResponderTest extends TestCase

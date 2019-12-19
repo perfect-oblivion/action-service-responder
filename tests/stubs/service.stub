@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Services\Sample;
+
+use PerfectOblivion\ActionServiceResponder\Services\Service;
+use PerfectOblivion\ActionServiceResponder\Services\Traits\SelfCallingService;
+
+class SampleService extends Service
+{
+    use SelfCallingService;
+
+    /**
+     * Construct a new SampleService.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Handle the call to the service.
+     *
+     * @param  array  $parameters
+     *
+     * @return mixed
+     */
+    public function run(array $parameters)
+    {
+        //
+    }
+}

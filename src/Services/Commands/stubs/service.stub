@@ -20,9 +20,11 @@ class DummyClass extends Service
     /**
      * Handle the call to the service.
      *
+     * @param  array  $parameters
+     *
      * @return mixed
      */
-    public function DummyMethod()
+    public function DummyMethod(array $parameters)
     {
         //
     }

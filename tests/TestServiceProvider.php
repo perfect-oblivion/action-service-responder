@@ -21,6 +21,6 @@ class TestServiceProvider extends ServiceProvider
     {
         Route::middleware('web')
              ->namespace('')
-             ->group(__DIR__.'/Stubs/routes/actions.php');
+             ->group(__DIR__.'/Foundation/routes/actions.php');
     }
 }
