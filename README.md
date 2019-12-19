@@ -44,7 +44,7 @@ php artisan vendor:publish --provider="PerfectOblivion\ActionServiceResponder\Ac
 This will copy the ```asr.php``` configuration file to your app's config folder.
 
 ## Usage
-In my opinion, the benefits of ASR has over traditional MVC, is clarity, narrow class responsibility, fewer dependencies, and overall organization.
+In my opinion, the benefits ASR has over traditional MVC, are clarity, narrow class responsibility, fewer dependencies, and overall organization.
 
 In my example-case below, I'll use all three components(Action, Service and Responder) along with the service validator. If you prefer, you can choose to mix and match, using only the components you need.
 
@@ -175,11 +175,7 @@ class StoreCommentService extends Service
 }
 ```
 
-1. A validator is injected via the service's constructor. The validator will run automatically, and the validated data will be available via the service's ```$data``` property. 
-
-> If you need to manually run the validator, you'll need to instantiate your service and call the ```run``` method directly. See [Alternative ways to call services](#alternative-ways-to-call-services)
-> If validation fails, it will behave like Laravel's form requests and throw an ValidationException. The exception will redirect and inject the validation errors in the global $errors object that is available to the view. In the case of an ajax request, a 422 will be returned along with the validation errors in a json object. This functionality can be customized in the same manner as form requests.
-
+1. A validator is injected via the service's constructor. The validator will run automatically, and the validated data will be available via the service's ```$data``` property.
 2. Any dependencies required by the Service may be injected via the Service constructor.
 3. The parameters from the Service call are passed to the ```run``` method. Within this method, you may work with those parameters or, if validation is used, you'll have access to the validated data via the Service's ```$data``` property.
 
@@ -189,7 +185,8 @@ class StoreCommentService extends Service
 ```sh
 php artisan asr:validation Comment\\StoreCommentValidationService
 ```
-> The default suffix for validators is "ValidationService". If you prefer another suffix or no suffix at all, a suffix configuration is available.
+> If you need to manually run the validator, you'll need to instantiate your service and call the ```run``` method directly. See [Alternative ways to call services](#alternative-ways-to-call-services)
+> If validation fails, it will behave like Laravel's form requests and throw an ValidationException. The exception will redirect and inject the validation errors in the global $errors object that is available to the view. In the case of an ajax request, a 422 will be returned along with the validation errors in a json object. This functionality can be customized in the same manner as form requests.
 
 ### Responders
 
@@ -241,6 +238,15 @@ Services may also be queued. In order to do this, you have a couple of options:
 |-----------------------|
 |(1) Data will not be returned to the controller form a queued service<br>(2) If you need to customize the queue name, connection name, or delay, use public properties on the Service class
 
+## Generating all components
+```sh
+php artisan asr:make Comment\\StoreComment --valid
+```
+This command will generate the following classes. Note the suffixes and namespaces. Suffixes and namespaces can be changed in the configuration file:
+- App\Http\Actions\Comment\StoreComment
+- App\Http\Responders\Comment\StoreCommentResponder
+- App\Services\Comment\StoreCommentService
+- App\Services\Comment\StoreCommentValidationService
 
 ## Taking it further with automation
 > Automatic services are still experimental.
@@ -250,14 +256,6 @@ Services may also be queued. In order to do this, you have a couple of options:
 
 > When using autorun, the current request data will be passed to the Service automatically.
 > If the service has a validator defined, the data will be validated before running the service logic.
-
-
-```php
-// StoreComment.php
-public function __invoke(StoreCommentService $service, Request $request)
-{
-    return view('comments.index'); //if you don't use the $service parameter in the method body, your IDE will yell at you. Using autorun is not recommended if your Service doesn't return a value.
-```
 
 ### How To
   - In your package configuration, set 'service_autorun' to true (default).
@@ -279,6 +277,14 @@ public function __invoke(StorePostService $service, Request $request)
 }
 ```
 
+> It is not recommended to use autorun Services if the Service has no return value. See example below:
+```php
+// StoreComment.php
+public function __invoke(StoreCommentService $service, Request $request)
+{
+    return view('comments.index'); //if you don't use the $service parameter in the method body, your IDE will yell at you. Using autorun is not recommended if your Service doesn't return a value.
+```
+
 ### Alternative ways to call services
 In addition to the methods discussed above, you may call services by:
 1. Using the "CallsServices" trait in your controller:
@@ -290,6 +296,12 @@ In addition to the methods discussed above, you may call services by:
 
 > If you choose to inject the service via constructor injection, you will need to set a public property($autorunIfEnabled = false) on your service.
 > If you don't plan to use 'autorun' for any of your services, you may set the package configuration option 'service_autorun' to false.
+
+## Rules
+Custom rules can be generated with the following command:
+```sh
+php artisan asr:rule MyCustomRule
+```
 
 ## Testing
 
