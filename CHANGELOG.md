@@ -11,3 +11,7 @@ All notable changes to PerfectOblivion/Actions will be documented in this file
 
 -   README updated.
 -   Github actions used for testing.
+
+## 0.0.3 - 2019-12-20
+
+-   Make route parameters available on the Service, if there are any.
