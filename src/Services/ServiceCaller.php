@@ -9,6 +9,9 @@ use PerfectOblivion\ActionServiceResponder\Services\Exceptions\ServiceHandlerMet
 
 class ServiceCaller extends AbstractServiceCaller
 {
+    /** @var \PerfectOblivion\ActionServiceResponder\Services\Service */
+    protected $resolvedService;
+
     /**
      * Call a service through its appropriate handler.
      *
@@ -19,20 +22,10 @@ class ServiceCaller extends AbstractServiceCaller
      */
     public function call($service, $params)
     {
-        if (! $this->hasHandler($service)) {
-            throw ServiceHandlerMethodException::notFound($service);
-        }
+        $this->prepareService($service);
+        $this->validateData($params);
 
-        $this->temporarilyDisableAutorun();
-
-        $resolved = $this->container->make($service);
-        $this->callValidator($resolved, $params);
-
-        if ($resolved instanceof ShouldQueueService) {
-            return $this->queue($service, $params);
-        }
-
-        return $resolved->{$this::$handlerMethod}($params);
+        return $this->shouldQueueService($this->resolvedService) ? $this->dispatchService($params) : $this->resolvedService->{$this::$handlerMethod}($params);
     }
 
     /**
@@ -42,37 +35,52 @@ class ServiceCaller extends AbstractServiceCaller
      * @param  mixed  $params
      *
      * @throws \PerfectOblivion\ActionServiceResponder\Exceptions\ServiceHandlerMethodException
-     *
-     * @return mixed
      */
-    public function queue($service, $params)
+    public function queue($service, $params): void
     {
-        if (! $this->hasHandler($service)) {
-            throw ServiceHandlerMethodException::notFound($service);
-        }
-
-        $this->temporarilyDisableAutorun();
-
-        $resolved = $this->container->make($service);
-        $this->callValidator($resolved, $params);
-
-        return resolve(Dispatcher::class)->dispatch(new QueuedService($resolved, $params));
+        $this->prepareService($service);
+        $this->validateData($params);
+        $this->dispatchService($params);
     }
 
     /**
      * Call the service's validator if it exists and hasn't been called yet.
      *
-     * @param  \PerfectOblivion\ActionServiceResponder\Services\Service  $service
      * @param  array  $params
      */
-    protected function callValidator(Service $service, array $params = []): void
+    private function validateData(array $params = []): void
     {
-        $validator = $service->getValidator();
+        $validator = $this->resolvedService->getValidator();
 
-        if ($validator && ! $service->isValidated()) {
-            $service->setData($validator->validate($params));
-            $service->setIsValidated(true);
+        if ($validator && ! $this->resolvedService->isValidated()) {
+            $this->resolvedService->setData($validator->validate($params));
+            $this->resolvedService->setIsValidated(true);
+        } else {
+            $this->resolvedService->setData($params);
         }
+    }
+
+    /**
+     * Dispatch a fully initialized Service to the queue.
+     *
+     * @param  array  $params
+     */
+    private function dispatchService(array $params): void
+    {
+        resolve(Dispatcher::class)->dispatch(new QueuedService($this->resolvedService, $params));
+    }
+
+    /**
+     * Prepare the Service to be run.
+     *
+     * @param  mixed  $service
+     */
+    private function prepareService($service): void
+    {
+        $this->confirmServiceHasHandler($service);
+        $this->temporarilyDisableAutorun();
+        $this->resolvedService = $this->container->make($service);
+        $this->resolvedService->parseRouteParameters();
     }
 
     /**
@@ -83,5 +91,29 @@ class ServiceCaller extends AbstractServiceCaller
         $this->container->resolving(Service::class, function($service, $app) {
             $service->autorunIfEnabled = false;
         });
+    }
+
+    /**
+     * Confirm that a Service has a handler method.
+     *
+     * @param  string  $service
+     *
+     * @throws \PerfectOblivion\ActionServiceResponder\Services\Exceptions\ServiceHandlerMethodException
+     */
+    private function confirmServiceHasHandler(string $service)
+    {
+        if (! $this->hasHandler($service)) {
+            throw ServiceHandlerMethodException::notFound($service);
+        }
+    }
+
+    /**
+     * Should the Service be queued?
+     *
+     * @param  \PerfectOblivion\ActionServiceResponder\Services\Service  $service
+     */
+    private function shouldQueueService(Service $service): bool
+    {
+        return $service instanceof ShouldQueueService;
     }
 }

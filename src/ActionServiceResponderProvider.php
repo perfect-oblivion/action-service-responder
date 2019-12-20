@@ -62,8 +62,6 @@ class ActionServiceResponderProvider extends BaseServiceProvider
             return new ServiceCaller($app);
         });
 
-        ServiceCaller::setHandlerMethod((string) Config::get('asr.service_method', 'run'));
-
         $this->app->alias(
             ServiceCaller::class,
             AbstractServiceCaller::class
@@ -164,8 +162,6 @@ class ActionServiceResponderProvider extends BaseServiceProvider
         if (($this->runningInHttpContext() || $this->app->environment() === 'testing')) {
             $this->app->afterResolving(Service::class, function ($service) {
                 if ($service->autorunIfEnabled && $this->shouldAutorunServices()) {
-                    $validator = $service->getValidator();
-                    $validator ? $service->setValidatedData($validator->validate($validator->data)) : $service->setData(resolve('request')->all());
                     $service->autorun();
                 }
             });

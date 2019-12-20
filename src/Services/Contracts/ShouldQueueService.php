@@ -6,6 +6,8 @@ interface ShouldQueueService
 {
     /**
      * Automatically queue the service
+     *
+     * @param  array  $parameters
      */
-    public function autoQueue(): void;
+    public function autoQueue(array $parameters): void;
 }

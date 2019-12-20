@@ -49,7 +49,7 @@ In my opinion, the benefits ASR has over traditional MVC, are clarity, narrow cl
 In my example-case below, I'll use all three components(Action, Service and Responder) along with the service validator. If you prefer, you can choose to mix and match, using only the components you need.
 
  ### CASE: USER SUBMITS A COMMENT TO A MESSAGE BOARD
- 
+
 
  ### Routes
 
@@ -60,7 +60,7 @@ In my example-case below, I'll use all three components(Action, Service and Resp
 Route::post('comment', Comment\StoreComment::class)->name('comment.store');
  ```
  > Inside my RouteServiceProvider, I have set my route namespace to 'App\Http\Actions'.
- 
+
 
  ### Actions
 
@@ -119,14 +119,13 @@ class StoreComment extends Action
 }
 ```
 
-Very often, this is as complex as your actions (controllers) will need to be. 
+Very often, this is as complex as your actions (controllers) will need to be.
 
 1. The action receives the request.
-2. The data from the request is passed to the appropriate service.
+2. The data from the request is passed to the appropriate service. (See [note on Service parameters](*note-on-service-parameters-and-properties))
 3. The return value of the Service call is given to the responder to handle as it sees fit.
 
 > Validation can be handled within the service's validator, which we will show in a moment([see Service Validators](#service-validators)). If you prefer not to use the service's validation, there's nothing stopping you from validating in your controller or using Laravel's form requests.
-
 
 ### Services
 
@@ -187,6 +186,22 @@ php artisan asr:validation Comment\\StoreCommentValidationService
 ```
 > If you need to manually run the validator, you'll need to instantiate your service and call the ```run``` method directly. See [Alternative ways to call services](#alternative-ways-to-call-services)
 > If validation fails, it will behave like Laravel's form requests and throw an ValidationException. The exception will redirect and inject the validation errors in the global $errors object that is available to the view. In the case of an ajax request, a 422 will be returned along with the validation errors in a json object. This functionality can be customized in the same manner as form requests.
+
+### Note on Service parameters and properties
+The signature of the Service ```run``` method is:
+```php
+public function run(array $parameters);
+```
+The $parameters passed to the ServiceCaller's ```call()``` method, will be passed to the Service's ```run()``` method. If using 'autorun' (See [autorun Services below](#taking-it-further-with-automation)), the current request input will be passed to the Service automatically.In addition to the parameters, there may be times when you need to pass models, via route parameters, to your Service. For instance, when updating a model, you may need to pass the parameters as well as the model that needs to be updated. The package does this behind the scenes by detecting if the Service is being used in the context of an http call, and if so, attaching the route parameters to the Service's ```$routeParameters``` property.
+
+For example, if your're hitting the following route:
+```php
+Route::post('/user/{user}', UpdateUser::class)->name('user.update');
+```
+In your Service, you will have access to the user via the ```$routeParameters``` property:
+```php
+$user = $this->routeParameters['user'];  // App\User object
+```
 
 ### Responders
 

@@ -69,18 +69,6 @@ class ServiceMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the method name for the class.
-     *
-     * @param  string  $rootNamespace
-     *
-     * @return string
-     */
-    protected function getMethodName()
-    {
-        return Config::get('asr.service_method', 'run');
-    }
-
-    /**
      * Get the desired class name from the input.
      *
      * @return string
@@ -108,25 +96,6 @@ class ServiceMakeCommand extends GeneratorCommand
     {
         $stub = $this->files->get($this->getStub());
 
-        return $this->replaceNamespace($stub, $name)->replaceMethod($stub)->replaceClass($stub, $name);
-    }
-
-    /**
-     * Replace the method name in the given stub.
-     *
-     * @param  string  $stub
-     * @param  string  $name
-     *
-     * @return $this
-     */
-    protected function replaceMethod(&$stub)
-    {
-        $stub = str_replace(
-            ['DummyMethod'],
-            [$this->getMethodName()],
-            $stub
-        );
-
-        return $this;
+        return $this->replaceNamespace($stub, $name)->replaceClass($stub, $name);
     }
 }

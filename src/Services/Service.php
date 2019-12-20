@@ -2,7 +2,7 @@
 
 namespace PerfectOblivion\ActionServiceResponder\Services;
 
-use PerfectOblivion\ActionServiceResponder\Services\ServiceCaller;
+use Illuminate\Contracts\Bus\Dispatcher;
 use PerfectOblivion\ActionServiceResponder\Services\Contracts\ShouldQueueService;
 use PerfectOblivion\ActionServiceResponder\Validation\Contracts\ValidationService;
 
@@ -10,6 +10,9 @@ abstract class Service
 {
     /** @var array */
     protected $data = [];
+
+    /** @var \Illuminate\Support\Collection|null */
+    protected $routeParameters;
 
     /** @var mixed */
     public $result;
@@ -25,8 +28,12 @@ abstract class Service
      */
     public function autorun(): void
     {
+        $this->parseRouteParameters();
+        $validator = $this->getValidator();
+        $validator ? $this->setValidatedData($validator->validate($validator->data)) : $this->setData(resolve('request')->all());
+
         if ($this instanceof ShouldQueueService) {
-            $this->autoQueue();
+            $this->autoQueue($this->data);
         } else {
             $this->result = $this->run($this->data);
         }
@@ -34,10 +41,12 @@ abstract class Service
 
     /**
      * Automatically queue the service
+     *
+     * @param  array  $parameters
      */
-    public function autoQueue(): void
+    public function autoQueue(array $parameters): void
     {
-        resolve(ServiceCaller::class)->call(get_class($this), $this->data);
+        resolve(Dispatcher::class)->dispatch(new QueuedService($this, $parameters));
     }
 
     /**
@@ -96,6 +105,16 @@ abstract class Service
     public function setValidatedData(array $data): Service
     {
         return $this->setData($data)->setIsValidated(true);
+    }
+
+    /**
+     * Parse the route parameters for the Service.
+     */
+    public function parseRouteParameters(): Service
+    {
+        $this->routeParameters = collect(optional(resolve('request')->route())->parameters());
+
+        return $this;
     }
 
     /**
