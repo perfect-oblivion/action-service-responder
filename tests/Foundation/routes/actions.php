@@ -5,6 +5,7 @@ use PerfectOblivion\ActionServiceResponder\Tests\Foundation\Actions\AutorunServi
 use PerfectOblivion\ActionServiceResponder\Tests\Foundation\Actions\NoAutorunServiceAction;
 use PerfectOblivion\ActionServiceResponder\Tests\Foundation\Actions\SimpleAction;
 use PerfectOblivion\ActionServiceResponder\Tests\Foundation\Actions\ServiceObjectResponderPayloadAction;
+use PerfectOblivion\ActionServiceResponder\Tests\Foundation\Actions\ServiceWithRouteParametersAction;
 use PerfectOblivion\ActionServiceResponder\Tests\Foundation\Actions\SimpleResponderAction;
 use PerfectOblivion\ActionServiceResponder\Tests\Foundation\Actions\SimpleResponderWithCustomRequestAction;
 use PerfectOblivion\ActionServiceResponder\Tests\Foundation\Actions\SimpleResponsableResponderAction;
@@ -22,3 +23,4 @@ Route::get('/simple-action-with-responder-via-responsable', SimpleResponsableRes
 Route::get('/simple-action-with-responder-payload', SimpleResponsableResponderWithPayloadAction::class);
 Route::get('/simple-action-with-responder-custom-request', SimpleResponderWithCustomRequestAction::class);
 Route::post('/action-with-service-object-responder-payload', ServiceObjectResponderPayloadAction::class);
+Route::post('/service-with-route-parameters/user/{user}', ServiceWithRouteParametersAction::class);
