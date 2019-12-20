@@ -184,7 +184,7 @@ class StoreCommentService extends Service
 ```sh
 php artisan asr:validation Comment\\StoreCommentValidationService
 ```
-> If you need to manually run the validator, you'll need to instantiate your service and call the ```run``` method directly. See [Alternative ways to call services](#alternative-ways-to-call-services)
+> If you need to manually run the validator, you'll need to resolve your service and call the ```run``` method directly. See [Alternative ways to call services](#alternative-ways-to-call-services)
 > If validation fails, it will behave like Laravel's form requests and throw an ValidationException. The exception will redirect and inject the validation errors in the global $errors object that is available to the view. In the case of an ajax request, a 422 will be returned along with the validation errors in a json object. This functionality can be customized in the same manner as form requests.
 
 ### Note on Service parameters and properties
