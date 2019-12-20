@@ -24,7 +24,7 @@ class DummyClass extends Service
      *
      * @return mixed
      */
-    public function DummyMethod(array $parameters)
+    public function run(array $parameters)
     {
         //
     }

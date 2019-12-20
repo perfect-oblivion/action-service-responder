@@ -5,9 +5,9 @@ namespace PerfectOblivion\ActionServiceResponder\Services;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
+use PerfectOblivion\ActionServiceResponder\Services\Service;
 
 class QueuedService implements ShouldQueue
 {
@@ -16,19 +16,22 @@ class QueuedService implements ShouldQueue
     /** @var string */
     protected $serviceClass;
 
+    /** @var \PerfectOblivion\ActionServiceResponder\Services\Service */
+    protected $service;
+
     /** @var array */
     protected $parameters;
 
     /**
      * Construct a new QueuedService.
      *
-     * @param  mixed  $service
+     * @param  \PerfectOblivion\ActionServiceResponder\Services\Service  $service
      * @param  array  $parameters
      */
-    public function __construct($service, array $parameters)
+    public function __construct(Service $service, array $parameters)
     {
         $this->serviceClass = get_class($service);
-
+        $this->service = $service;
         $this->parameters = $parameters;
         $this->resolveQueueableProperties($service);
     }
@@ -48,10 +51,7 @@ class QueuedService implements ShouldQueue
      */
     public function handle()
     {
-        $service = app($this->serviceClass);
-        $method = Config::get('asr.service_method', 'run');
-
-        $service->{$method}($this->parameters);
+        $this->service->run($this->parameters);
     }
 
     /**
@@ -66,10 +66,8 @@ class QueuedService implements ShouldQueue
 
     /**
      * Resolve the queable properties.
-     *
-     * @param  mixed  $service
      */
-    protected function resolveQueueableProperties($service)
+    protected function resolveQueueableProperties()
     {
         $queueableProperties = [
             'connection',
@@ -81,7 +79,7 @@ class QueuedService implements ShouldQueue
         ];
 
         foreach ($queueableProperties as $queueableProperty) {
-            $this->{$queueableProperty} = $service->{$queueableProperty} ?? $this->{$queueableProperty};
+            $this->{$queueableProperty} = $this->service->{$queueableProperty} ?? $this->{$queueableProperty};
         }
     }
 }

@@ -78,16 +78,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Service Method Name
-    |--------------------------------------------------------------------------
-    |
-    | Set the method name for handling services.
-    |
-     */
-    'service_method' => 'run',
-
-    /*
-    |--------------------------------------------------------------------------
     | Duplicate Suffixes
     |--------------------------------------------------------------------------
     |
@@ -223,7 +213,7 @@ return [
     |
     | Set the suffix to be used when generating validation services.
     |
-        */
+    */
     'validation_service_suffix' => 'ValidationService',
 
     /*
@@ -237,4 +227,14 @@ return [
     |
     */
     'validation_service_override_duplicate_suffix' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Model Baseclass
+    |--------------------------------------------------------------------------
+    |
+    | The base or parent class of your eloquent models.
+    |
+    */
+    'model_baseclass' => \Illuminate\Database\Eloquent\Model::class,
 ];
