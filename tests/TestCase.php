@@ -22,6 +22,8 @@ class TestCase extends Orchestra
 
         $this->publishConfiguration();
         $this->setPackagePaths();
+        $this->withFactories(__DIR__.'/Foundation/database/factories');
+        $this->loadMigrationsFrom(__DIR__.'/Foundation/database/migrations');
     }
 
     /**
@@ -51,5 +53,20 @@ class TestCase extends Orchestra
     private function publishConfiguration(): void
     {
         Artisan::call('vendor:publish --provider="PerfectOblivion\ActionServiceResponder\ActionServiceResponderProvider"');
+    }
+
+    /**
+     * Define environment setup.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     */
+    protected function getEnvironmentSetUp($app): void
+    {
+        $app['config']->set('database.default', 'testbench');
+        $app['config']->set('database.connections.testbench', [
+            'driver'   => 'sqlite',
+            'database' => ':memory:',
+            'prefix'   => '',
+        ]);
     }
 }
