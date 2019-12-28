@@ -3,9 +3,9 @@
 namespace PerfectOblivion\ActionServiceResponder\Services;
 
 use Illuminate\Contracts\Bus\Dispatcher;
-use PerfectOblivion\ActionServiceResponder\Services\Service;
 use PerfectOblivion\ActionServiceResponder\Services\Contracts\ShouldQueueService;
 use PerfectOblivion\ActionServiceResponder\Services\Exceptions\ServiceHandlerMethodException;
+use PerfectOblivion\ActionServiceResponder\Services\Service;
 
 class ServiceCaller extends AbstractServiceCaller
 {
@@ -52,9 +52,12 @@ class ServiceCaller extends AbstractServiceCaller
     {
         $validator = $this->resolvedService->getValidator();
 
-        if ($validator && ! $this->resolvedService->isValidated()) {
-            $this->resolvedService->setData($validator->validate($params));
-            $this->resolvedService->setIsValidated(true);
+        if ($validator) {
+            $validator->service = $this->resolvedService;
+            if (! $this->resolvedService->isValidated()) {
+                $this->resolvedService->setData($validator->validate($params));
+                $this->resolvedService->setIsValidated(true);
+            }
         } else {
             $this->resolvedService->setData($params);
         }
@@ -88,7 +91,7 @@ class ServiceCaller extends AbstractServiceCaller
      */
     private function temporarilyDisableAutorun(): void
     {
-        $this->container->resolving(Service::class, function($service, $app) {
+        $this->container->resolving(Service::class, function ($service, $app) {
             $service->autorunIfEnabled = false;
         });
     }

@@ -3,6 +3,7 @@
 namespace PerfectOblivion\ActionServiceResponder\Services;
 
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Support\Collection;
 use PerfectOblivion\ActionServiceResponder\Services\Contracts\ShouldQueueService;
 use PerfectOblivion\ActionServiceResponder\Validation\Contracts\ValidationService;
 
@@ -24,13 +25,19 @@ abstract class Service
     public $autorunIfEnabled = true;
 
     /**
-     * Automatically run the service
+     * Automatically run the service.
      */
     public function autorun(): void
     {
         $this->parseRouteParameters();
         $validator = $this->getValidator();
-        $validator ? $this->setValidatedData($validator->validate($validator->data)) : $this->setData(resolve('request')->all());
+
+        if ($validator) {
+            $this->setValidatedData($validator->validate($validator->data));
+            $validator->service = $this;
+        } else {
+            $this->setData(resolve('request')->all());
+        }
 
         if ($this instanceof ShouldQueueService) {
             $this->autoQueue($this->data);
@@ -40,7 +47,7 @@ abstract class Service
     }
 
     /**
-     * Automatically queue the service
+     * Automatically queue the service.
      *
      * @param  array  $parameters
      */
@@ -62,7 +69,7 @@ abstract class Service
      *
      * @param  array  $data
      */
-    public function setData(array $data): Service
+    public function setData(array $data): self
     {
         $this->data = $data;
 
@@ -78,11 +85,27 @@ abstract class Service
     }
 
     /**
+     * Get the service route parameters.
+     *
+     * @return mixed
+     */
+    public function getRouteParameters($parameter = null)
+    {
+        if ($parameter) {
+            if ($this->routeParameters && $this->routeParameters->has($parameter)) {
+                return $this->routeParameters->get($parameter);
+            }
+        }
+
+        return $this->routeParameters;
+    }
+
+    /**
      * Set the isValidated state for the service.
      *
      * @param  bool  $validated
      */
-    public function setIsValidated(bool $validated): Service
+    public function setIsValidated(bool $validated): self
     {
         $this->validated = $validated;
 
@@ -102,7 +125,7 @@ abstract class Service
      *
      * @param  array  $data
      */
-    public function setValidatedData(array $data): Service
+    public function setValidatedData(array $data): self
     {
         return $this->setData($data)->setIsValidated(true);
     }
@@ -110,7 +133,7 @@ abstract class Service
     /**
      * Parse the route parameters for the Service.
      */
-    public function parseRouteParameters(): Service
+    public function parseRouteParameters(): self
     {
         $this->routeParameters = collect(optional(resolve('request')->route())->parameters());
 
