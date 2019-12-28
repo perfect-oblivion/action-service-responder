@@ -1,7 +1,7 @@
 {
     "name": "perfect-oblivion/action-service-responder",
     "description": "Service aware actions for Laravel",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "keywords": [
         "perfect-oblivion",
         "actions",

@@ -16,26 +16,17 @@ class ValidationService implements Contract
 {
     use HandlesRedirects, InteractsWithValidationData, SanitizesInput, PreparesCustomRulesForServiceValidator;
 
-    /**
-     * The container instance.
-     *
-     * @var \Illuminate\Contracts\Container\Container
-     */
+    /** @var \Illuminate\Contracts\Container\Container */
     protected $container;
 
-    /**
-     * The key to be used for the view error bag.
-     *
-     * @var string
-     */
+    /** @var string */
     protected $errorBag = 'default';
 
-    /**
-     * The data to be validated.
-     *
-     * @var array
-     */
+    /** @var array */
     public $data;
+
+    /** @var \PerfectOblivion\ActionServiceResponder\Services\Service|null */
+    public $service;
 
     /**
      * Validate the class instance.
