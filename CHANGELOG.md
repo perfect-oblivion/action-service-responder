@@ -19,3 +19,7 @@ All notable changes to PerfectOblivion/Actions will be documented in this file
 ## 0.0.4 - 2019-12-28
 
 -   Make the Service class available in the Service's Validator via ```$service``` property.
+
+## 0.0.5 - 2019-12-28
+
+-   Service's ```$validator``` property should be "protected".
