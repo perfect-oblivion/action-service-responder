@@ -3,26 +3,28 @@
 namespace PerfectOblivion\ActionServiceResponder\Services;
 
 use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Support\Collection;
 use PerfectOblivion\ActionServiceResponder\Services\Contracts\ShouldQueueService;
 use PerfectOblivion\ActionServiceResponder\Validation\Contracts\ValidationService;
 
 abstract class Service
 {
+    /** @var mixed */
+    public $result;
+
+    /** @var bool */
+    public $autorunIfEnabled = true;
+
     /** @var array */
     protected $data = [];
 
     /** @var \Illuminate\Support\Collection|null */
     protected $routeParameters;
 
-    /** @var mixed */
-    public $result;
-
     /** @var bool */
     protected $validated = false;
 
-    /** @var bool */
-    public $autorunIfEnabled = true;
+    /** @var \PerfectOblivion\ActionServiceResponder\Validation\Contracts\ValidationService|null */
+    protected $validator;
 
     /**
      * Automatically run the service.
