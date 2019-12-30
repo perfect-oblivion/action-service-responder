@@ -3,6 +3,7 @@
 namespace PerfectOblivion\ActionServiceResponder\Services;
 
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Support\Collection;
 use PerfectOblivion\ActionServiceResponder\Services\Contracts\ShouldQueueService;
 use PerfectOblivion\ActionServiceResponder\Validation\Contracts\ValidationService;
 
@@ -18,7 +19,7 @@ abstract class Service
     protected $data = [];
 
     /** @var \Illuminate\Support\Collection|null */
-    protected $routeParameters;
+    protected $supplementals;
 
     /** @var bool */
     protected $validated = false;
@@ -31,7 +32,7 @@ abstract class Service
      */
     public function autorun(): void
     {
-        $this->parseRouteParameters();
+        $this->buildSupplementals();
         $validator = $this->getValidator();
 
         if ($validator) {
@@ -87,19 +88,53 @@ abstract class Service
     }
 
     /**
-     * Get the service route parameters.
+     * Build the supplementals for the service.
+     *
+     * @param  array  $supplementals
+     */
+    public function buildSupplementals(array $supplementals = []): self
+    {
+        $passed = new Collection($supplementals);
+        $route = resolve('request')->route();
+        $routeParameters = $route ? new Collection($route->parameters()) : null;
+        $exists = $this->supplementals && $this->supplementals instanceof Collection;
+        $combined = $passed->merge($routeParameters);
+
+        if ($exists) {
+            $this->supplementals = $this->supplementals->merge($combined);
+        } else {
+            $this->supplementals = $combined;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set the supplementals for the service.
+     *
+     * @param  \Illuminate\Support\Collection  $supplementals
+     */
+    public function setSupplementals(Collection $supplementals): self
+    {
+        $this->supplementals = $supplementals;
+
+        return $this;
+    }
+
+    /**
+     * Get the service supplemental parameters.
      *
      * @return mixed
      */
-    public function getRouteParameters($parameter = null)
+    public function getSupplementals($parameter = null)
     {
         if ($parameter) {
-            if ($this->routeParameters && $this->routeParameters->has($parameter)) {
-                return $this->routeParameters->get($parameter);
+            if ($this->supplementals && $this->supplementals->has($parameter)) {
+                return $this->supplementals->get($parameter);
             }
         }
 
-        return $this->routeParameters;
+        return $this->supplementals;
     }
 
     /**
@@ -130,16 +165,6 @@ abstract class Service
     public function setValidatedData(array $data): self
     {
         return $this->setData($data)->setIsValidated(true);
-    }
-
-    /**
-     * Parse the route parameters for the Service.
-     */
-    public function parseRouteParameters(): self
-    {
-        $this->routeParameters = collect(optional(resolve('request')->route())->parameters());
-
-        return $this;
     }
 
     /**

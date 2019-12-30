@@ -3,6 +3,7 @@
 namespace PerfectOblivion\ActionServiceResponder\Services;
 
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Support\Collection;
 use PerfectOblivion\ActionServiceResponder\Services\Contracts\ShouldQueueService;
 use PerfectOblivion\ActionServiceResponder\Services\Exceptions\ServiceHandlerMethodException;
 use PerfectOblivion\ActionServiceResponder\Services\Service;
@@ -16,31 +17,61 @@ class ServiceCaller extends AbstractServiceCaller
      * Call a service through its appropriate handler.
      *
      * @param  string  $service
-     * @param  mixed  $params
+     * @param  array  $params
+     * @param  array  $supplementals
      *
      * @return mixed
      */
-    public function call($service, $params)
+    public function call(string $service, array $params, array $supplementals = [])
     {
-        $this->prepareService($service);
+        $this->prepareService($service, $supplementals);
         $this->validateData($params);
 
-        return $this->shouldQueueService($this->resolvedService) ? $this->dispatchService($params) : $this->resolvedService->{$this::$handlerMethod}($params);
+        return $this->shouldQueueService($this->resolvedService)
+            ? $this->dispatchService(
+                $params,
+                $this->resolvedService->getData(),
+                $this->resolvedService->isValidated(),
+                $this->resolvedService->getSupplementals(),
+                get_object_vars($this->resolvedService),
+            )
+            : $this->resolvedService->run($params);
     }
 
     /**
      * Push the service call to the queue..
      *
      * @param  string  $service
-     * @param  mixed  $params
+     * @param  array  $params
+     * @param  array  $supplementals
      *
      * @throws \PerfectOblivion\ActionServiceResponder\Exceptions\ServiceHandlerMethodException
      */
-    public function queue($service, $params): void
+    public function queue(string $service, array $params, array $supplementals = []): void
     {
-        $this->prepareService($service);
+        $this->prepareService($service, $supplementals);
         $this->validateData($params);
-        $this->dispatchService($params);
+        $this->dispatchService(
+            $params,
+            $this->resolvedService->getData(),
+            $this->resolvedService->isValidated(),
+            $this->resolvedService->getSupplementals(),
+            get_object_vars($this->resolvedService),
+        );
+    }
+
+    /**
+     * Prepare the Service to be run.
+     *
+     * @param  string  $service
+     * @param  array  $supplementals
+     */
+    private function prepareService(string $service, array $supplementals): void
+    {
+        $this->confirmServiceHasHandler($service);
+        $this->temporarilyDisableAutorun();
+        $this->resolvedService = $this->container->make($service);
+        $this->resolvedService->buildSupplementals($supplementals);
     }
 
     /**
@@ -67,23 +98,14 @@ class ServiceCaller extends AbstractServiceCaller
      * Dispatch a fully initialized Service to the queue.
      *
      * @param  array  $params
+     * @param  array  $data
+     * @param  bool  $validated
+     * @param  \Illuminate\Support\Collection  $supplementals
+     * @param  array  $props
      */
-    private function dispatchService(array $params): void
+    private function dispatchService(array $params, array $data, bool $validated, Collection $supplementals, array $props): void
     {
-        resolve(Dispatcher::class)->dispatch(new QueuedService($this->resolvedService, $params));
-    }
-
-    /**
-     * Prepare the Service to be run.
-     *
-     * @param  mixed  $service
-     */
-    private function prepareService($service): void
-    {
-        $this->confirmServiceHasHandler($service);
-        $this->temporarilyDisableAutorun();
-        $this->resolvedService = $this->container->make($service);
-        $this->resolvedService->parseRouteParameters();
+        resolve(Dispatcher::class)->dispatch(new QueuedService($this->resolvedService, $params, $data, $validated, $supplementals, $props));
     }
 
     /**

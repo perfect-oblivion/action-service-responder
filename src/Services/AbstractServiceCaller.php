@@ -14,13 +14,6 @@ abstract class AbstractServiceCaller
     protected $container;
 
     /**
-     * The handler method to be called.
-     *
-     * @var string
-     */
-    public static $handlerMethod = 'run';
-
-    /**
      * Create a new service caller instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -34,41 +27,29 @@ abstract class AbstractServiceCaller
      * Call a service.
      *
      * @param  string  $service
-     * @param  mixed  $params
+     * @param  array  $params
+     * @param  array  $supplementals
      *
      * @return mixed
      */
-    abstract public function call($service, $params);
+    abstract public function call(string $service, array $params, array $supplementals = []);
 
     /**
      * Queue a service.
      *
      * @param  string  $service
-     * @param  mixed  $params
-     *
-     * @return mixed
+     * @param  array  $params
+     * @param  array  $supplementals
      */
-    abstract public function queue($service, $params);
+    abstract public function queue(string $service, array $params, array $supplementals = []): void;
 
     /**
      * Determine if the service handler method exists.
      *
      * @param  mixed  $service
-     *
-     * @return bool
      */
-    public function hasHandler($service)
+    public function hasHandler($service): bool
     {
-        return method_exists($service, $this::$handlerMethod);
-    }
-
-    /**
-     * Set the handler method name for services.
-     *
-     * @param  string  $method
-     */
-    public static function setHandlerMethod(string $method = 'run')
-    {
-        static::$handlerMethod = $method;
+        return method_exists($service, 'run');
     }
 }
