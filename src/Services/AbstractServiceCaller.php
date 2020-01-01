@@ -6,11 +6,7 @@ use Illuminate\Contracts\Container\Container;
 
 abstract class AbstractServiceCaller
 {
-    /**
-     * The container implementation.
-     *
-     * @var \Illuminate\Contracts\Container\Container
-     */
+    /** @var \Illuminate\Contracts\Container\Container */
     protected $container;
 
     /**
