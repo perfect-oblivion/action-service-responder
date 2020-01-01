@@ -5,7 +5,7 @@ namespace PerfectOblivion\ActionServiceResponder\Tests\Foundation\Services;
 use PerfectOblivion\ActionServiceResponder\Services\Service;
 use PerfectOblivion\ActionServiceResponder\Services\Traits\SelfCallingService;
 
-class TestServiceWithRouteParameters extends Service
+class TestServiceWithSupplementalParameters extends Service
 {
     use SelfCallingService;
 
@@ -18,6 +18,6 @@ class TestServiceWithRouteParameters extends Service
      */
     public function run(array $parameters)
     {
-        return ['name' => $this->data['name'], 'user' => $this->routeParameters['user']->name];
+        return ['name' => $this->data['name'], 'user' => $this->getSupplementals('user')->name];
     }
 }

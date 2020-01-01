@@ -42,11 +42,11 @@ class ServiceTest extends TestCase
     }
 
     /** @test */
-    public function route_parameters_are_available_on_services()
+    public function supplemental_parameters_are_available_on_services()
     {
         $user = factory(User::class)->create(['name' => 'Clayton Stone']);
         $response = $this->withExceptionHandling()
-                        ->json('post', "/service-with-route-parameters/user/{$user->id}", ['name' => 'Clayton Stone']);
+                        ->json('post', "/service-with-supplemental-parameters/user/{$user->id}", ['name' => 'Clayton Stone']);
 
         $response->assertStatus(200);
         $response->assertJsonFragment(['name' => 'Clayton Stone', 'user' => 'Clayton Stone']);
