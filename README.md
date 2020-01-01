@@ -200,11 +200,11 @@ public function run(array $parameters);
 The $parameters passed to the ServiceCaller's ```call()``` method, will be passed to the Service's ```run()``` method. If using 'autorun' (See [autorun Services below](#taking-it-further-with-automation)), the current request input will be passed to the Service automatically.
 
 **Properties**
-In addition to the passed parameters, there may be times when your Service needs access to additional data. When using a Service in the context of an HTTP request, any route parameters will be available in the Service via the ```$supplementals``` property. You may also explicitly pass supplemental data to the Service by passing an extra array when the Service is called:
+In addition to the passed parameters, there may be times when your Service needs access to additional data. When using a Service in the context of an HTTP request, any route parameters will be available in the Service via the ```$supplementals``` property ([See Supplemental class](https://github.com/perfect-oblivion/action-service-responder/blob/master/src/Services/Supplementals.php)]). You may also explicitly pass supplemental data to the Service by passing an extra array when the Service is called:
 ```php
 StoreCommentService::call($request->only(['title', 'body']), ['user' => User::find(1)]);
 ```
-in this example, the User will be available through the ```$supplementals``` property of the Service, or via the ```getSupplementals()``` method. See [getSupplementals() description below](#getSupplementals-method)Any route parameters will also be available.
+in this example, the User will be available through the ```$supplementals``` property of the Service ([See Supplemental class](https://github.com/perfect-oblivion/action-service-responder/blob/master/src/Services/Supplementals.php)]), or via the ```getSupplementals()``` method. See [getSupplementals() description below](#getSupplementals-method)Any route parameters will also be available.
 The ```$supplementals``` property is an instance of ```Illuminate\Support\Collection```.
 
 For example, if your're hitting the following route:

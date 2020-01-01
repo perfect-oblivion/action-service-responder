@@ -24,20 +24,20 @@ abstract class AbstractServiceCaller
      *
      * @param  string  $service
      * @param  array  $parameters
-     * @param  array  $supplementals
+     * @param  array  $supplementalParameters
      *
      * @return mixed
      */
-    abstract public function call(string $service, array $parameters, array $supplementals = []);
+    abstract public function call(string $service, array $parameters, array $supplementalParameters = []);
 
     /**
      * Queue a service.
      *
      * @param  string  $service
      * @param  array  $parameters
-     * @param  array  $supplementals
+     * @param  array  $supplementalParameters
      */
-    abstract public function queue(string $service, array $parameters, array $supplementals = []): void;
+    abstract public function queue(string $service, array $parameters, array $supplementalParameters = []): void;
 
     /**
      * Determine if the service handler method exists.

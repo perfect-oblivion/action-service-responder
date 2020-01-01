@@ -12,13 +12,13 @@ trait CallsServices
      *
      * @param  string  $service
      * @param  array  $parameters
-     * @param  array  $supplementals
+     * @param  array  $supplementalParameters
      *
      * @return mixed
      */
-    public function call(string $service, array $parameters, array $supplementals = [])
+    public function call(string $service, array $parameters, array $supplementalParameters = [])
     {
-        return Container::getInstance()->make(ServiceCaller::class)->call($service, $parameters, $supplementals);
+        return Container::getInstance()->make(ServiceCaller::class)->call($service, $parameters, $supplementalParameters);
     }
 
     /**
@@ -26,14 +26,14 @@ trait CallsServices
      *
      * @param  string  $service
      * @param  array  $parameters
-     * @param  array  $supplementals
+     * @param  array  $supplementalParameters
      *
      * @throws \PerfectOblivion\ActionServiceResponder\Exceptions\ServiceHandlerMethodException
      *
      * @return mixed
      */
-    public function queue(string $service, array $parameters, array $supplementals = [])
+    public function queue(string $service, array $parameters, array $supplementalParameters = [])
     {
-        return Container::getInstance()->make(ServiceCaller::class)->queue($service, $parameters, $supplementals);
+        return Container::getInstance()->make(ServiceCaller::class)->queue($service, $parameters, $supplementalParameters);
     }
 }
