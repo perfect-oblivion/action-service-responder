@@ -134,38 +134,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Form Request Namespace
-    |--------------------------------------------------------------------------
-    |
-    | Set the namespace for the Form Requests.
-    |
-    */
-    'form_request_namespace' => 'Http\\Requests',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Form Request Suffix
-    |--------------------------------------------------------------------------
-    |
-    | Set the suffix to be used when generating Enhanced Form Requests.
-    |
-    */
-    'form_request_suffix' => 'Request',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Form Request Duplicate Suffixes
-    |--------------------------------------------------------------------------
-    |
-    | If you have a Request suffix set and try to generate a Request that also includes the suffix,
-    | the package will recognize this duplication and rename the Request to remove the suffix.
-    | This is the default behavior. To override and allow the duplication, change to false.
-    |
-    */
-    'form_request_override_duplicate_suffix' => true,
-
-    /*
-    |--------------------------------------------------------------------------
     | Custom Rule Namespace
     |--------------------------------------------------------------------------
     |
