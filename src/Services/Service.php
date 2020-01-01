@@ -34,8 +34,8 @@ abstract class Service
         $validator = $this->getValidator();
 
         if ($validator) {
-            $this->setValidatedData($validator->validate($validator->data));
             $validator->service = $this;
+            $this->setValidatedData($validator->validate($validator->data));
         } else {
             $this->setData(resolve('request')->all());
         }
