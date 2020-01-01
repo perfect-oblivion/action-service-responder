@@ -11,25 +11,25 @@ trait SelfCallingService
      * Run the service.
      *
      * @param  array  $parameters
-     * @param  array  $supplementals
+     * @param  array  $supplementalParameters
      *
      * @return mixed
      */
-    public static function call(array $parameters, array $supplementals = [])
+    public static function call(array $parameters, array $supplementalParameters = [])
     {
-        return Container::getInstance()->make(ServiceCaller::class)->call(static::class, $parameters, $supplementals);
+        return Container::getInstance()->make(ServiceCaller::class)->call(static::class, $parameters, $supplementalParameters);
     }
 
     /**
      * Push the service call to the queue.
      *
      * @param  array  $parameters
-     * @param  array  $supplementals
+     * @param  array  $supplementalParameters
      *
      * @return mixed
      */
-    public static function queue(array $parameters, array $supplementals = [])
+    public static function queue(array $parameters, array $supplementalParameters = [])
     {
-        return Container::getInstance()->make(ServiceCaller::class)->queue(static::class, $parameters, $supplementals);
+        return Container::getInstance()->make(ServiceCaller::class)->queue(static::class, $parameters, $supplementalParameters);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace PerfectOblivion\ActionServiceResponder\Services;
 
-use Illuminate\Support\Collection;
+use PerfectOblivion\ActionServiceResponder\Services\Supplementals;
 use PerfectOblivion\ActionServiceResponder\Validation\Contracts\ValidationService;
 
 abstract class Service
@@ -16,7 +16,7 @@ abstract class Service
     /** @var array */
     public $data = [];
 
-    /** @var \Illuminate\Support\Collection|null */
+    /** @var \PerfectOblivion\ActionServiceResponder\Services\Supplementals|null */
     public $supplementals;
 
     /** @var bool */
@@ -78,11 +78,11 @@ abstract class Service
      */
     public function buildSupplementals(array $supplementals = []): self
     {
-        $route = resolve('request')->route();
-        $combined = (new Collection($supplementals))
-            ->merge($route ? new Collection($route->parameters()) : new Collection([]));
+        $routeParameters = optional(resolve('request')->route())->parameters();
 
-        if ($this->supplementals && $this->supplementals instanceof Collection) {
+        $combined = Supplementals::create($supplementals)->merge($routeParameters);
+
+        if ($this->supplementals instanceof Supplementals) {
             $this->supplementals = $this->supplementals->merge($combined);
         } else {
             $this->supplementals = $combined;
@@ -94,11 +94,15 @@ abstract class Service
     /**
      * Set the supplementals for the service.
      *
-     * @param  \Illuminate\Support\Collection  $supplementals
+     * @param  mixed  $supplementals
      */
-    public function setSupplementals(Collection $supplementals): self
+    public function setSupplementals($supplementals): self
     {
-        $this->supplementals = $supplementals;
+        if ($supplementals instanceof Supplementals) {
+            $this->supplementals = $supplementals;
+        } else {
+            $this->supplementals = Supplementals::create($supplementals);
+        }
 
         return $this;
     }
@@ -116,7 +120,7 @@ abstract class Service
             }
         }
 
-        return $this->supplementals;
+        return $this->supplementals->all();
     }
 
     /**
