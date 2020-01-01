@@ -2,9 +2,7 @@
 
 namespace PerfectOblivion\ActionServiceResponder\Services;
 
-use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Collection;
-use PerfectOblivion\ActionServiceResponder\Services\Contracts\ShouldQueueService;
 use PerfectOblivion\ActionServiceResponder\Validation\Contracts\ValidationService;
 
 abstract class Service
@@ -16,13 +14,13 @@ abstract class Service
     public $autorunIfEnabled = true;
 
     /** @var array */
-    protected $data = [];
+    public $data = [];
 
     /** @var \Illuminate\Support\Collection|null */
-    protected $supplementals;
+    public $supplementals;
 
     /** @var bool */
-    protected $validated = false;
+    public $validated = false;
 
     /** @var \PerfectOblivion\ActionServiceResponder\Validation\Contracts\ValidationService|null */
     protected $validator;
@@ -42,21 +40,7 @@ abstract class Service
             $this->setData(resolve('request')->all());
         }
 
-        if ($this instanceof ShouldQueueService) {
-            $this->autoQueue($this->data);
-        } else {
-            $this->result = $this->run($this->data);
-        }
-    }
-
-    /**
-     * Automatically queue the service.
-     *
-     * @param  array  $parameters
-     */
-    public function autoQueue(array $parameters): void
-    {
-        resolve(Dispatcher::class)->dispatch(new QueuedService($this, $parameters));
+        $this->result = $this->run($this->data);
     }
 
     /**
@@ -94,13 +78,11 @@ abstract class Service
      */
     public function buildSupplementals(array $supplementals = []): self
     {
-        $passed = new Collection($supplementals);
         $route = resolve('request')->route();
-        $routeParameters = $route ? new Collection($route->parameters()) : null;
-        $exists = $this->supplementals && $this->supplementals instanceof Collection;
-        $combined = $passed->merge($routeParameters);
+        $combined = (new Collection($supplementals))
+            ->merge($route ? new Collection($route->parameters()) : new Collection([]));
 
-        if ($exists) {
+        if ($this->supplementals && $this->supplementals instanceof Collection) {
             $this->supplementals = $this->supplementals->merge($combined);
         } else {
             $this->supplementals = $combined;

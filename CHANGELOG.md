@@ -23,3 +23,8 @@ All notable changes to PerfectOblivion/Actions will be documented in this file
 ## 0.0.5 - 2019-12-28
 
 -   Service's ```$validator``` property should be "protected".
+
+## 0.0.6 - 2019-12-31
+
+-   Fix broken queued services.
+-   Remove ability to autorun queued services.

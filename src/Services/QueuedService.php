@@ -7,49 +7,51 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Collection;
 use PerfectOblivion\ActionServiceResponder\Services\Service;
+use PerfectOblivion\ActionServiceResponder\Services\Traits\DisablesAutorun;
 
 class QueuedService implements ShouldQueue
 {
-    use Queueable, SerializesModels, InteractsWithQueue, Dispatchable;
+    use Queueable, SerializesModels, InteractsWithQueue, Dispatchable, DisablesAutorun;
 
-    /** @var string */
-    protected $serviceClass;
+    /** @var array */
+    protected $data;
 
     /** @var array */
     protected $parameters;
 
     /** @var array */
-    protected $data;
+    public $queueableProperties = [
+        'connection',
+        'queue',
+        'chainConnection',
+        'chainQueue',
+        'delay',
+        'chained',
+        'tries',
+        'timeout',
+    ];
 
-    /** @var bool */
-    protected $validated;
+    /** @var string */
+    protected $serviceClass;
 
     /** @var \Illuminate\Support\Collection */
     protected $supplementals;
 
-    /** @var array */
-    protected $props;
+    /** @var bool */
+    protected $validated;
 
     /**
      * Construct a new QueuedService.
      *
      * @param  \PerfectOblivion\ActionServiceResponder\Services\Service  $service
      * @param  array  $parameters
-     * @param  array  $data
-     * @param  bool  $validated
-     * @param  \Illuminate\Support\Collection  $supplementals
-     * @param  array  $props
      */
-    public function __construct(Service $service, array $parameters, array $data, bool $validated, Collection $supplementals, array $props)
+    public function __construct(Service $service, array $parameters)
     {
         $this->serviceClass = get_class($service);
         $this->parameters = $parameters;
-        $this->data = $data;
-        $this->validated = $validated;
-        $this->supplementals = $supplementals;
-        $this->props = $props;
+        $this->copyServiceProperties($service);
         $this->resolveQueueableProperties($service);
     }
 
@@ -58,9 +60,10 @@ class QueuedService implements ShouldQueue
      */
     public function handle(): void
     {
+        $this->disableAutorun();
         $service = resolve($this->serviceClass);
-        $this->setRequiredServiceProperties($service);
-        $this->setPublicServiceProperties($service);
+        $this->setCopiedServiceProperties($service);
+
         $service->run($this->parameters);
     }
 
@@ -81,47 +84,42 @@ class QueuedService implements ShouldQueue
     }
 
     /**
+     * Set the properties for the Service
+     *
+     * @param  \PerfectOblivion\ActionServiceResponder\Services\Service  $service
+     */
+    private function copyServiceProperties(Service $service): void
+    {
+        $this->supplementals = $service->getSupplementals();
+        $this->data = $service->data;
+        $this->validated = $service->isValidated();
+    }
+
+    /**
+     * Set the copied properties on the Service.
+     *
+     * @param  \PerfectOblivion\ActionServiceResponder\Services\Service  $service
+     */
+    private function setCopiedServiceProperties(Service $service): Service
+    {
+        $service->data = $this->data;
+        $service->supplementals = $this->supplementals;
+        $service->validated = $this->validated;
+
+        return $service;
+    }
+
+    /**
      * Resolve the queable properties.
      *
      * @param  mixed  $service
      */
-    protected function resolveQueueableProperties($service): void
+    private function resolveQueueableProperties($service): void
     {
-        $queueableProperties = [
-            'connection',
-            'queue',
-            'chainConnection',
-            'chainQueue',
-            'delay',
-            'chained',
-        ];
-
-        foreach ($queueableProperties as $queueableProperty) {
-            $this->{$queueableProperty} = $service->{$queueableProperty} ?? $this->{$queueableProperty};
-        }
-    }
-
-    /**
-     * Set the required Service properties.
-     *
-     * @param  \PerfectOblivion\ActionServiceResponder\Services\Service  $service
-     */
-    private function setRequiredServiceProperties(Service $service): void
-    {
-        $service->setData($this->data);
-        $service->setIsValidated($this->validated);
-        $service->setSupplementals($this->supplementals);
-    }
-
-    /**
-     * Set the public properties for the Service
-     *
-     * @param  \PerfectOblivion\ActionServiceResponder\Services\Service  $service
-     */
-    private function setPublicServiceProperties(Service $service): void
-    {
-        foreach($this->props as $key => $value) {
-            $service->{$key} = $value;
+        foreach ($this->queueableProperties as $queueableProperty) {
+            if (property_exists($service, $queueableProperty)) {
+                $this->{$queueableProperty} = $service->{$queueableProperty};
+            }
         }
     }
 }
