@@ -119,7 +119,7 @@ class StoreComment extends Action
 }
 ```
 
-Very often, this is as complex as your actions (controllers) will need to be.
+Very often, this is as complex as your actions (controllers) need to be.
 
 1. The action receives the request.
 2. The data from the request is passed to the appropriate service. (See [note on Service parameters](*note-on-service-parameters-and-properties))
@@ -150,7 +150,7 @@ class StoreCommentService extends Service
 {
     use SelfCallingService;
 
-    public $validator;
+    protected $validator;
 
     /**
      * Construct a new StoreCommentService.
@@ -180,27 +180,44 @@ class StoreCommentService extends Service
 
 
 ### Service Validators
+Service validators perform in the same way Laravel's form requests do.
 
 ```sh
 php artisan asr:validation Comment\\StoreCommentValidationService
 ```
-> If you need to manually run the validator, you'll need to resolve your service and call the ```run``` method directly. See [Alternative ways to call services](#alternative-ways-to-call-services)
-> If validation fails, it will behave like Laravel's form requests and throw an ValidationException. The exception will redirect and inject the validation errors in the global $errors object that is available to the view. In the case of an ajax request, a 422 will be returned along with the validation errors in a json object. This functionality can be customized in the same manner as form requests.
+If you need to manually run the validator, you'll need to resolve your service and call the ```run``` method directly. See [Alternative ways to call services](#alternative-ways-to-call-services)
+
+If validation fails, it will behave like Laravel's form requests and throw an ValidationException. The exception will redirect and inject the validation errors in the global $errors object that is available to the view. In the case of an ajax request, a 422 will be returned along with the validation errors in a json object. This functionality can be customized in the same manner as form requests.
+> The validator has access to the Service class via the ```$service``` property. This helps if you need access to the Service's supplemental parameters, or other properties.
+
 
 ### Note on Service parameters and properties
 The signature of the Service ```run``` method is:
 ```php
 public function run(array $parameters);
 ```
-The $parameters passed to the ServiceCaller's ```call()``` method, will be passed to the Service's ```run()``` method. If using 'autorun' (See [autorun Services below](#taking-it-further-with-automation)), the current request input will be passed to the Service automatically.In addition to the parameters, there may be times when you need to pass models, via route parameters, to your Service. For instance, when updating a model, you may need to pass the parameters as well as the model that needs to be updated. The package does this behind the scenes by detecting if the Service is being used in the context of an http call, and if so, attaching the route parameters to the Service's ```$routeParameters``` property.
+**Parameters**
+The $parameters passed to the ServiceCaller's ```call()``` method, will be passed to the Service's ```run()``` method. If using 'autorun' (See [autorun Services below](#taking-it-further-with-automation)), the current request input will be passed to the Service automatically.
+
+**Properties**
+In addition to the passed parameters, there may be times when your Service needs access to additional data. When using a Service in the context of an HTTP request, any route parameters will be available in the Service via the ```$supplementals``` property. You may also explicitly pass supplemental data to the Service by passing an extra array when the Service is called:
+```php
+StoreCommentService::call($request->only(['title', 'body']), ['user' => User::find(1)]);
+```
+in this example, the User will be available through the ```$supplementals``` property of the Service, or via the ```getSupplementals()``` method. See [getSupplementals() description below](#getSupplementals-method)Any route parameters will also be available.
+The ```$supplementals``` property is an instance of ```Illuminate\Support\Collection```.
 
 For example, if your're hitting the following route:
 ```php
 Route::post('/user/{user}', UpdateUser::class)->name('user.update');
 ```
-In your Service, you will have access to the user via the ```$routeParameters``` property:
+In your Service, you will have access to the user via the ```$supplementals``` property.
+
+### getSupplementals method
+The ```getSupplementals()``` method will return the entire Collection if no arguments are passed. You may pass a string argument to get a specific value from the Collection.
+
 ```php
-$user = $this->routeParameters['user'];  // App\User object
+$user = $this->getSupplementals('user');
 ```
 
 ### Responders
@@ -249,9 +266,7 @@ Services may also be queued. In order to do this, you have a couple of options:
 1. The service may implement the ShouldQueueService interface.
 2. Instead of using the ```call``` method from your controller, you may use the ```queue``` method.
 
-|Note on queued services|
-|-----------------------|
-|(1) Data will not be returned to the controller form a queued service<br>(2) If you need to customize the queue name, connection name, or delay, use public properties on the Service class
+> Data will not be returned to the controller form a queued service<br>If you need to customize the queue name, connection name, or delay, use public properties on the Service class
 
 ## Generating all components
 ```sh
@@ -267,7 +282,7 @@ This command will generate the following classes. Note the suffixes and namespac
 > Automatic services are still experimental.
 
 ### When to use automatically run services
-- If you are in the context of an http request and your Service returns a value.
+- If the Service returns a value, you are in the context of an http request, and your Service is not queued.
 
 > When using autorun, the current request data will be passed to the Service automatically.
 > If the service has a validator defined, the data will be validated before running the service logic.

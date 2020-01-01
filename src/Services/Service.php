@@ -2,8 +2,7 @@
 
 namespace PerfectOblivion\ActionServiceResponder\Services;
 
-use Illuminate\Contracts\Bus\Dispatcher;
-use PerfectOblivion\ActionServiceResponder\Services\Contracts\ShouldQueueService;
+use Illuminate\Support\Collection;
 use PerfectOblivion\ActionServiceResponder\Validation\Contracts\ValidationService;
 
 abstract class Service
@@ -15,13 +14,13 @@ abstract class Service
     public $autorunIfEnabled = true;
 
     /** @var array */
-    protected $data = [];
+    public $data = [];
 
     /** @var \Illuminate\Support\Collection|null */
-    protected $routeParameters;
+    public $supplementals;
 
     /** @var bool */
-    protected $validated = false;
+    public $validated = false;
 
     /** @var \PerfectOblivion\ActionServiceResponder\Validation\Contracts\ValidationService|null */
     protected $validator;
@@ -31,31 +30,17 @@ abstract class Service
      */
     public function autorun(): void
     {
-        $this->parseRouteParameters();
+        $this->buildSupplementals();
         $validator = $this->getValidator();
 
         if ($validator) {
-            $this->setValidatedData($validator->validate($validator->data));
             $validator->service = $this;
+            $this->setValidatedData($validator->validate($validator->data));
         } else {
             $this->setData(resolve('request')->all());
         }
 
-        if ($this instanceof ShouldQueueService) {
-            $this->autoQueue($this->data);
-        } else {
-            $this->result = $this->run($this->data);
-        }
-    }
-
-    /**
-     * Automatically queue the service.
-     *
-     * @param  array  $parameters
-     */
-    public function autoQueue(array $parameters): void
-    {
-        resolve(Dispatcher::class)->dispatch(new QueuedService($this, $parameters));
+        $this->result = $this->run($this->data);
     }
 
     /**
@@ -87,19 +72,51 @@ abstract class Service
     }
 
     /**
-     * Get the service route parameters.
+     * Build the supplementals for the service.
+     *
+     * @param  array  $supplementals
+     */
+    public function buildSupplementals(array $supplementals = []): self
+    {
+        $route = resolve('request')->route();
+        $combined = (new Collection($supplementals))
+            ->merge($route ? new Collection($route->parameters()) : new Collection([]));
+
+        if ($this->supplementals && $this->supplementals instanceof Collection) {
+            $this->supplementals = $this->supplementals->merge($combined);
+        } else {
+            $this->supplementals = $combined;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set the supplementals for the service.
+     *
+     * @param  \Illuminate\Support\Collection  $supplementals
+     */
+    public function setSupplementals(Collection $supplementals): self
+    {
+        $this->supplementals = $supplementals;
+
+        return $this;
+    }
+
+    /**
+     * Get the service supplemental parameters.
      *
      * @return mixed
      */
-    public function getRouteParameters($parameter = null)
+    public function getSupplementals($parameter = null)
     {
         if ($parameter) {
-            if ($this->routeParameters && $this->routeParameters->has($parameter)) {
-                return $this->routeParameters->get($parameter);
+            if ($this->supplementals && $this->supplementals->has($parameter)) {
+                return $this->supplementals->get($parameter);
             }
         }
 
-        return $this->routeParameters;
+        return $this->supplementals;
     }
 
     /**
@@ -130,16 +147,6 @@ abstract class Service
     public function setValidatedData(array $data): self
     {
         return $this->setData($data)->setIsValidated(true);
-    }
-
-    /**
-     * Parse the route parameters for the Service.
-     */
-    public function parseRouteParameters(): self
-    {
-        $this->routeParameters = collect(optional(resolve('request')->route())->parameters());
-
-        return $this;
     }
 
     /**
