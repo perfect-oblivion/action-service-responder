@@ -4,10 +4,10 @@ namespace PerfectOblivion\ActionServiceResponder\Tests\Foundation\Actions;
 
 use Illuminate\Http\Request;
 use PerfectOblivion\ActionServiceResponder\Tests\Foundation\Models\User;
-use PerfectOblivion\ActionServiceResponder\Tests\Foundation\Services\TestServiceWithRouteParameters;
+use PerfectOblivion\ActionServiceResponder\Tests\Foundation\Services\TestServiceWithSupplementalParameters;
 use PerfectOblivion\ActionServiceResponder\Actions\Action;
 
-class ServiceWithRouteParametersAction extends Action
+class ServiceWithSupplementalParametersAction extends Action
 {
     /**
      * Execute the action.
@@ -16,6 +16,6 @@ class ServiceWithRouteParametersAction extends Action
      */
     public function __invoke(Request $request, User $user)
     {
-        return TestServiceWithRouteParameters::call($request->all());
+        return TestServiceWithSupplementalParameters::call($request->all());
     }
 }
