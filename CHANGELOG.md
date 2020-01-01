@@ -28,3 +28,8 @@ All notable changes to PerfectOblivion/Actions will be documented in this file
 
 -   Fix broken queued services.
 -   Remove ability to autorun queued services.
+
+## 0.0.7 - 2020-01-01
+
+-   Remove FormRequests in favor of the built-in Laravel Form Requests.
+-   Add a Supplementals class for handling Service supplemental parameters.
