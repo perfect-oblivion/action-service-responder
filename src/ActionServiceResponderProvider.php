@@ -15,7 +15,6 @@ use PerfectOblivion\ActionServiceResponder\Services\Commands\ServiceMakeCommand;
 use PerfectOblivion\ActionServiceResponder\Services\Service;
 use PerfectOblivion\ActionServiceResponder\Services\ServiceCaller;
 use PerfectOblivion\ActionServiceResponder\Validation\Commands\CustomRuleMakeCommand;
-use PerfectOblivion\ActionServiceResponder\Validation\Commands\FormRequestMakeCommand;
 use PerfectOblivion\ActionServiceResponder\Validation\Commands\ValidationServiceMakeCommand;
 use PerfectOblivion\ActionServiceResponder\Validation\ValidationService\ValidationService;
 
@@ -96,7 +95,6 @@ class ActionServiceResponderProvider extends BaseServiceProvider
     {
         $this->commands([
             ActionMakeCommand::class,
-            FormRequestMakeCommand::class,
             CustomRuleMakeCommand::class,
             ValidationServiceMakeCommand::class,
             ServiceMakeCommand::class,
