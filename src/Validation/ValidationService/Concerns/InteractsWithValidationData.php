@@ -24,7 +24,7 @@ trait InteractsWithValidationData
      */
     public function validated()
     {
-        $rules = $this->container->call([$this, 'rules']);
+        $rules = $this->resolveAndCall($this, 'rules', $this->service->getSupplementals());
 
         return $this->only(collect($rules)->keys()->map(function ($rule) {
             return explode('.', $rule)[0];

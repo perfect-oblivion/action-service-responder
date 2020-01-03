@@ -78,12 +78,12 @@ abstract class Service
      */
     public function buildSupplementals(array $supplementals = []): self
     {
-        $routeParameters = optional(resolve('request')->route())->parameters();
+        $routeParameters = optional(resolve('request')->route())->parametersWithoutNulls();
 
-        $combined = Supplementals::create($supplementals)->merge($routeParameters);
+        $combined = Supplementals::create($supplementals)->addItems($routeParameters);
 
         if ($this->supplementals instanceof Supplementals) {
-            $this->supplementals = $this->supplementals->merge($combined);
+            $this->supplementals = $this->supplementals->addItems($combined);
         } else {
             $this->supplementals = $combined;
         }
