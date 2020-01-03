@@ -14,8 +14,8 @@ trait SanitizesInput
      */
     public function sanitizeData(): void
     {
-        if ($this->filters()) {
-            $sanitizer = new Sanitizer($this->all(), $this->filters());
+        if ($filters = $this->resolveAndCall($this, 'filters', $this->service->getSupplementals())) {
+            $sanitizer = new Sanitizer($this->all(), $filters);
             $this->replace($sanitizer->sanitize());
         }
     }

@@ -3,6 +3,7 @@
 namespace PerfectOblivion\ActionServiceResponder\Services;
 
 use Illuminate\Support\Collection;
+use PerfectOblivion\ActionServiceResponder\Services\Exceptions\DuplicateSupplementalItemException;
 
 class Supplementals extends Collection
 {
@@ -27,14 +28,19 @@ class Supplementals extends Collection
     }
 
     /**
-     * Merge the current object with the given data.
+     * Add the given item to the current object.
      *
-     * @param  array  $data
+     * @param  mixed  $data
      */
-    public function merge($items): self
+    public function addItems($items): self
     {
         if ($items) {
-            return $this->mergeRecursive($items);
+            collect($items)->each(function ($item, $key) {
+                if ($this->has($key)) {
+                    throw DuplicateSupplementalItemException::create($key);
+                }
+                $this[$key] = $item;
+            });
         }
 
         return $this;

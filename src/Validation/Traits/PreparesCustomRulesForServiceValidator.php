@@ -12,7 +12,7 @@ trait PreparesCustomRulesForServiceValidator
      */
     public function prepareCustomRules()
     {
-        collect($this->rules())->each(function ($rules, $attribute) {
+        collect($this->resolveAndCall($this, 'rules', $this->service->getSupplementals()))->each(function ($rules, $attribute) {
             collect(Arr::wrap($rules))->whereInstanceOf(CustomRule::class)->each(function ($rule) {
                 $rule::validator($this->getValidator());
                 $rule::service($this);

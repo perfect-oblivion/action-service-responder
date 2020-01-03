@@ -33,3 +33,10 @@ All notable changes to PerfectOblivion/Actions will be documented in this file
 
 -   Remove FormRequests in favor of the built-in Laravel Form Requests.
 -   Add a Supplementals class for handling Service supplemental parameters.
+
+## 0.0.8 - 2020-01-02
+
+-   Resolve ```rules()```, ```messages()```, ```filters()```, and ```attributes()``` methods from the Container.
+   -   The Service supplementals are considered when resolving these methods.
+-   Fix merging supplementals.
+   -   Throw exception if duplicate keys detected.

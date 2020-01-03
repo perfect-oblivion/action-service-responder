@@ -189,6 +189,14 @@ If you need to manually run the validator, you'll need to resolve your service a
 
 If validation fails, it will behave like Laravel's form requests and throw an ValidationException. The exception will redirect and inject the validation errors in the global $errors object that is available to the view. In the case of an ajax request, a 422 will be returned along with the validation errors in a json object. This functionality can be customized in the same manner as form requests.
 > The validator has access to the Service class via the ```$service``` property. This helps if you need access to the Service's supplemental parameters, or other properties.
+> The ```rules()```, ```messages()```, ```filters()```, and ```attributes()``` methods of the validator are resolved from the Container. When resolving, the ```$supplementals``` of the service are taken into consideration. So, for example, if there is a ```App\User``` instance in your service ```$supplementals``` property, and you typehint your rules method as follows:
+```php
+public function rules(User $user)
+{
+    //
+}
+```
+you will receive the User instance that is stored in the service ```$supplementals``` property.
 
 
 ### Note on Service parameters and properties

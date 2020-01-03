@@ -8,13 +8,14 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\ValidationException;
 use PerfectOblivion\ActionServiceResponder\Validation\Contracts\ValidationService as Contract;
 use PerfectOblivion\ActionServiceResponder\Validation\Traits\PreparesCustomRulesForServiceValidator;
+use PerfectOblivion\ActionServiceResponder\Validation\Traits\ResolvesMethods;
 use PerfectOblivion\ActionServiceResponder\Validation\Traits\SanitizesInput;
 use PerfectOblivion\ActionServiceResponder\Validation\ValidationService\Concerns\HandlesRedirects;
 use PerfectOblivion\ActionServiceResponder\Validation\ValidationService\Concerns\InteractsWithValidationData;
 
 class ValidationService implements Contract
 {
-    use HandlesRedirects, InteractsWithValidationData, SanitizesInput, PreparesCustomRulesForServiceValidator;
+    use HandlesRedirects, InteractsWithValidationData, ResolvesMethods, SanitizesInput, PreparesCustomRulesForServiceValidator;
 
     /** @var \Illuminate\Contracts\Container\Container */
     protected $container;
@@ -47,11 +48,7 @@ class ValidationService implements Contract
 
         $validator = $this->getValidator();
 
-        if (! $validator->passes()) {
-            $this->failedValidation($validator);
-        }
-
-        return $this->validated();
+        return $validator->fails() ? $this->failedValidation($validator) : $this->validated();
     }
 
     /**
@@ -62,13 +59,10 @@ class ValidationService implements Contract
     protected function getValidator()
     {
         $factory = $this->container->make(ValidationFactory::class);
-        $validator = $this->container->call([$this, 'validator'], compact('factory'));
 
-        if (method_exists($this, 'withValidator')) {
-            $this->withValidator($validator);
-        }
-
-        return $validator;
+        return tap($this->container->call([$this, 'validator'], compact('factory')), function ($v) {
+            $this->withValidator($v);
+        });
     }
 
     /**
@@ -96,9 +90,9 @@ class ValidationService implements Contract
     {
         return $factory->make(
             $this->validationData() ?? [],
-            $this->container->call([$this, 'rules']),
-            $this->messages(),
-            $this->attributes()
+            $this->resolveAndCall($this, 'rules', $this->service->getSupplementals()),
+            $this->resolveAndCall($this, 'messages', $this->service->getSupplementals()),
+            $this->resolveAndCall($this, 'attributes', $this->service->getSupplementals()),
         );
     }
 
@@ -155,6 +149,16 @@ class ValidationService implements Contract
         $this->container = $container;
 
         return $this;
+    }
+
+    /**
+     * Configure the validator instance.
+     *
+     * @param  \Illuminate\Validation\Validator  $validator
+     */
+    public function withValidator($validator): void
+    {
+        //
     }
 
     /**
