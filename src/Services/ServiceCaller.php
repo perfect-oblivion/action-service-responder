@@ -23,7 +23,7 @@ class ServiceCaller extends AbstractServiceCaller
      *
      * @return mixed
      */
-    public function call(string $service, array $parameters, array $supplementalParameters = [])
+    public function call(string $service, array $parameters = [], array $supplementalParameters = [])
     {
         $this->prepareService($service, $supplementalParameters);
         $this->validateData($parameters);
@@ -40,7 +40,7 @@ class ServiceCaller extends AbstractServiceCaller
      *
      * @throws \PerfectOblivion\ActionServiceResponder\Exceptions\ServiceHandlerMethodException
      */
-    public function queue(string $service, array $parameters, array $supplementalParameters = []): void
+    public function queue(string $service, array $parameters = [], array $supplementalParameters = []): void
     {
         $this->prepareService($service, $supplementalParameters);
         $this->validateData($parameters);

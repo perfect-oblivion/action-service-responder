@@ -2,6 +2,7 @@
 
 namespace PerfectOblivion\ActionServiceResponder\Services;
 
+use Illuminate\Support\Str;
 use PerfectOblivion\ActionServiceResponder\Services\Supplementals;
 use PerfectOblivion\ActionServiceResponder\Validation\Contracts\ValidationService;
 
@@ -160,5 +161,30 @@ abstract class Service
      *
      * @return mixed
      */
-    abstract public function run(array $parameters);
+    abstract public function run(array $parameters = []);
+
+    public function __get(string $key)
+    {
+        if (Str::contains($key, '.')) {
+            $parts = explode('.', $key);
+            $collection = $parts[0];
+            $key = $parts[1];
+
+            if ($collection === 'supplementals') {
+                return $this->getSupplementals($key);
+            }
+
+            if ($collection === 'data') {
+                return $this->data[$key];
+            }
+        }
+
+        if (array_key_exists($key, $this->data)) {
+            return $this->data[$key];
+        }
+
+        if (array_key_exists($key, $this->supplementals->all())) {
+            return $this->getSupplementals($key);
+        }
+    }
 }

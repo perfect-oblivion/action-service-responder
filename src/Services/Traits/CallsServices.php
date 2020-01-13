@@ -16,7 +16,7 @@ trait CallsServices
      *
      * @return mixed
      */
-    public function call(string $service, array $parameters, array $supplementalParameters = [])
+    public function call(string $service, array $parameters = [], array $supplementalParameters = [])
     {
         return Container::getInstance()->make(ServiceCaller::class)->call($service, $parameters, $supplementalParameters);
     }
@@ -32,7 +32,7 @@ trait CallsServices
      *
      * @return mixed
      */
-    public function queue(string $service, array $parameters, array $supplementalParameters = [])
+    public function queue(string $service, array $parameters = [], array $supplementalParameters = [])
     {
         return Container::getInstance()->make(ServiceCaller::class)->queue($service, $parameters, $supplementalParameters);
     }
