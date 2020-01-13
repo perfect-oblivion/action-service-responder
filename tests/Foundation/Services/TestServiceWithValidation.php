@@ -32,7 +32,7 @@ class TestServiceWithValidation extends Service
      *
      * @return mixed
      */
-    public function run(array $parameters)
+    public function run(array $parameters = [])
     {
         return ['name' => $parameters['name'], 'validated' => $this->isValidated()];
     }

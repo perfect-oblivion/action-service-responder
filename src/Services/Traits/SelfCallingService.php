@@ -15,7 +15,7 @@ trait SelfCallingService
      *
      * @return mixed
      */
-    public static function call(array $parameters, array $supplementalParameters = [])
+    public static function call(array $parameters = [], array $supplementalParameters = [])
     {
         return Container::getInstance()->make(ServiceCaller::class)->call(static::class, $parameters, $supplementalParameters);
     }
@@ -28,7 +28,7 @@ trait SelfCallingService
      *
      * @return mixed
      */
-    public static function queue(array $parameters, array $supplementalParameters = [])
+    public static function queue(array $parameters = [], array $supplementalParameters = [])
     {
         return Container::getInstance()->make(ServiceCaller::class)->queue(static::class, $parameters, $supplementalParameters);
     }

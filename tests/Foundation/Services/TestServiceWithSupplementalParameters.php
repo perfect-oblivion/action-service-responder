@@ -16,7 +16,7 @@ class TestServiceWithSupplementalParameters extends Service
      *
      * @return mixed
      */
-    public function run(array $parameters)
+    public function run(array $parameters = [])
     {
         return ['name' => $this->data['name'], 'user' => $this->getSupplementals('user')->name];
     }
