@@ -40,3 +40,13 @@ All notable changes to PerfectOblivion/Actions will be documented in this file
    -   The Service supplementals are considered when resolving these methods.
 -   Fix merging supplementals.
    -   Throw exception if duplicate keys detected.
+
+## 0.0.9 - 2020-01-13
+
+-   Make Service run method parameter array optional.
+-   Add magic getter to Service.
+   -   eg. If you want a 'name' property, ```$this->name```
+      -   Data will be checked first, then supplementals.
+   -   If your data and supplementals contain the duplicated keys, you'll still need to use the existing functionality.
+      -   ```$this->getSupplementals($key);```
+      -   ```$this->data[$key];```

@@ -165,20 +165,6 @@ abstract class Service
 
     public function __get(string $key)
     {
-        if (Str::contains($key, '.')) {
-            $parts = explode('.', $key);
-            $collection = $parts[0];
-            $key = $parts[1];
-
-            if ($collection === 'supplementals') {
-                return $this->getSupplementals($key);
-            }
-
-            if ($collection === 'data') {
-                return $this->data[$key];
-            }
-        }
-
         if (array_key_exists($key, $this->data)) {
             return $this->data[$key];
         }
