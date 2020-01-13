@@ -16,7 +16,7 @@ class TestAutorunService extends Service
      *
      * @return mixed
      */
-    public function run(array $parameters)
+    public function run(array $parameters = [])
     {
         return $parameters;
     }

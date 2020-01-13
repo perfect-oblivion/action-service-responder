@@ -167,7 +167,7 @@ class StoreCommentService extends Service
      *
      * @return mixed
      */
-    public function run(array $parameters)
+    public function run(array $parameters = [])
     {
         return $this->doSomeWork($this->data); // see notes below
     }
@@ -202,7 +202,7 @@ you will receive the User instance that is stored in the service ```$supplementa
 ### Note on Service parameters and properties
 The signature of the Service ```run``` method is:
 ```php
-public function run(array $parameters);
+public function run(array $parameters = []);
 ```
 **Parameters**
 The $parameters passed to the ServiceCaller's ```call()``` method, will be passed to the Service's ```run()``` method. If using 'autorun' (See [autorun Services below](#taking-it-further-with-automation)), the current request input will be passed to the Service automatically.
