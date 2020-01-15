@@ -50,3 +50,13 @@ All notable changes to PerfectOblivion/Actions will be documented in this file
    -   If your data and supplementals contain the duplicated keys, you'll still need to use the existing functionality.
       -   ```$this->getSupplementals($key);```
       -   ```$this->data[$key];```
+
+## 0.1.0 - 2020-01-14
+
+-   Add Service caching.
+   -   To cache the result of a Service call, be sure the Service implements the CachedService interface and implement the interface methods:
+      -   ```CachedService::cacheIdentifier()``` should return a unique string to be used as the cache key.
+      -   ```CachedService::cacheTime()``` should return a ```DateTimeInterface```, ```DateInterval```, an integer (seconds), or null.
+   -   To clear the cache, you may either use the key and clear the cache via the different ways that Laravel provides, or use the
+       ```PerfectOblivion\ActionServiceProvider\Services\CacheHandler::forget($service)``` method. You may pass the name of the Service to the
+       ```forget()``` method. If you have an instance of the Service, you may pass it instead of the Service name.

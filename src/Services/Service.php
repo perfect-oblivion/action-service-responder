@@ -2,7 +2,9 @@
 
 namespace PerfectOblivion\ActionServiceResponder\Services;
 
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
+use PerfectOblivion\ActionServiceResponder\Services\Contracts\CachedService;
+use PerfectOblivion\ActionServiceResponder\Services\Exceptions\InvalidCachedService;
 use PerfectOblivion\ActionServiceResponder\Services\Supplementals;
 use PerfectOblivion\ActionServiceResponder\Validation\Contracts\ValidationService;
 
@@ -38,10 +40,14 @@ abstract class Service
             $validator->service = $this;
             $this->setValidatedData($validator->validate($validator->data));
         } else {
-            $this->setData(resolve('request')->all());
+            $this->setData(app()->make('request')->all());
         }
 
-        $this->result = $this->run($this->data);
+        if ($this instanceof CachedService) {
+            $this->result = $this->runCached($this->data);
+        } else {
+            $this->result = $this->run($this->data);
+        }
     }
 
     /**
@@ -73,13 +79,49 @@ abstract class Service
     }
 
     /**
+     * Get the cache key for the service.
+     *
+     * @throws \PerfectOblivion\ActionServiceResponder\Services\Exceptions\InvalidCachedService
+     */
+    public function getCacheKey(): string
+    {
+        throw_unless(method_exists($this, 'cacheIdentifier'), InvalidCachedService::missingCacheIdentifier(static::class));
+
+        return app()->call([$this, 'cacheIdentifier']);
+    }
+
+    /**
+     * Get the cache ttl.
+     *
+     * @return \DateTimeInterface|\DateInterval|int|null
+     *
+     * @throws \PerfectOblivion\ActionServiceResponder\Services\Exceptions\InvalidCachedService
+     */
+    public function getCacheTime()
+    {
+        throw_unless(method_exists($this, 'cacheTime'), InvalidCachedService::missingCacheTime(static::class));
+
+        return app()->call([$this, 'cacheTime']);
+    }
+
+    /**
+     * Forget the cached Service result by key.
+     *
+     * @throws \PerfectOblivion\ActionServiceResponder\Services\Exceptions\InvalidCachedService
+     */
+    public function forgetCache(): void
+    {
+        Cache::forget($this->getCacheKey());
+    }
+
+    /**
      * Build the supplementals for the service.
      *
      * @param  array  $supplementals
      */
     public function buildSupplementals(array $supplementals = []): self
     {
-        $routeParameters = optional(resolve('request')->route())->parametersWithoutNulls();
+        $routeParameters = optional(app()->make('request')->route())->parametersWithoutNulls();
 
         $combined = Supplementals::create($supplementals)->addItems($routeParameters);
 
@@ -152,6 +194,20 @@ abstract class Service
     public function setValidatedData(array $data): self
     {
         return $this->setData($data)->setIsValidated(true);
+    }
+
+    /**
+     * Run cached service.
+     *
+     * @param  array  $parameters
+     *
+     * @return mixed
+     */
+    public function runCached(array $parameters)
+    {
+        return Cache::remember($this->getCacheKey(), $this->getCacheTime(), function () use ($parameters) {
+            return $this->run($parameters);
+        });
     }
 
     /**

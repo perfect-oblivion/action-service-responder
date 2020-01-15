@@ -146,7 +146,7 @@ class ActionServiceResponderProvider extends BaseServiceProvider
     {
         $this->app->resolving(ValidationService::class, function ($resolved, $app) {
             if ($this->runningInHttpContext()) {
-                $resolved->setData(resolve('request')->all());
+                $resolved->setData($app->make('request')->all());
             }
             $resolved->setContainer($app)->setRedirector($app->make(Redirector::class));
         });

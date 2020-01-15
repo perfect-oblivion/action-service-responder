@@ -3,6 +3,7 @@
 namespace PerfectOblivion\ActionServiceResponder\Services;
 
 use Illuminate\Contracts\Bus\Dispatcher;
+use PerfectOblivion\ActionServiceResponder\Services\Contracts\CachedService;
 use PerfectOblivion\ActionServiceResponder\Services\Contracts\ShouldQueueService;
 use PerfectOblivion\ActionServiceResponder\Services\Exceptions\ServiceHandlerMethodException;
 use PerfectOblivion\ActionServiceResponder\Services\Traits\DisablesAutorun;
@@ -28,7 +29,15 @@ class ServiceCaller extends AbstractServiceCaller
         $this->prepareService($service, $supplementalParameters);
         $this->validateData($parameters);
 
-        return $this->shouldQueueService() ? $this->dispatchService($parameters) : $this->resolvedService->run($parameters);
+        if ($this->shouldQueueService()) {
+            return $this->dispatchService($parameters);
+        }
+
+        if ($this->shouldCacheService()) {
+            return $this->resolvedService->runCached($parameters);
+        }
+
+        return $this->resolvedService->run($parameters);
     }
 
     /**
@@ -56,7 +65,7 @@ class ServiceCaller extends AbstractServiceCaller
     private function prepareService(string $service, array $supplementalParameters): void
     {
         $this->confirmServiceHasHandler($service);
-        $this->disableAutorun();
+        $this::disableAutorun();
         $this->resolvedService = $this->container->make($service);
         $this->resolvedService->buildSupplementals($supplementalParameters);
     }
@@ -88,7 +97,7 @@ class ServiceCaller extends AbstractServiceCaller
      */
     private function dispatchService(array $parameters): void
     {
-        resolve(Dispatcher::class)->dispatch(new QueuedService($this->resolvedService, $parameters));
+        app()->make(Dispatcher::class)->dispatch(new QueuedService($this->resolvedService, $parameters));
     }
 
     /**
@@ -109,5 +118,13 @@ class ServiceCaller extends AbstractServiceCaller
     private function shouldQueueService(): bool
     {
         return $this->resolvedService instanceof ShouldQueueService;
+    }
+
+    /**
+     * Should the Service be cached?
+     */
+    private function shouldCacheService(): bool
+    {
+        return $this->resolvedService instanceof CachedService;
     }
 }

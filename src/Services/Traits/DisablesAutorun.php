@@ -10,9 +10,9 @@ trait DisablesAutorun
     /**
      * Temporarily disable the service autorun.
      */
-    private function disableAutorun(): void
+    public static function disableAutorun(): void
     {
-        Container::getInstance()->resolving(Service::class, function ($service, $app) {
+        Container::getInstance()->resolving(Service::class, static function ($service, $app) {
             $service->autorunIfEnabled = false;
         });
     }

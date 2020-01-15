@@ -18,7 +18,7 @@ There are 3 basic components of this pattern.
 - Services: handle calculation and logic specific to your domain
 - Responders: responsible for handing data back to the consumer
 
-## Installation
+### Installation
 You can install the package via composer. From your project directory, in your terminal, enter:
 ```bash
 composer require perfect-oblivion/action-service-responder
@@ -34,7 +34,7 @@ If you have this functionality disabled, you may manually add the package servic
 ];
 ```
 
-## Configuration
+### Configuration
 The package comes with some default settings configured. If you would like to tweak these settings, such as namespaces, command names, etc., run the command below in your terminal.
 
 ```bash
@@ -43,7 +43,7 @@ php artisan vendor:publish --provider="PerfectOblivion\ActionServiceResponder\Ac
 
 This will copy the ```asr.php``` configuration file to your app's config folder.
 
-## Usage
+### Usage
 In my opinion, the benefits ASR has over traditional MVC, are clarity, narrow class responsibility, fewer dependencies, and overall organization.
 
 In my example-case below, I'll use all three components(Action, Service and Responder) along with the service validator. If you prefer, you can choose to mix and match, using only the components you need.
@@ -51,7 +51,7 @@ In my example-case below, I'll use all three components(Action, Service and Resp
  ### CASE: USER SUBMITS A COMMENT TO A MESSAGE BOARD
 
 
- ### Routes
+ ## Routes
 
  ```php
  <?php
@@ -62,7 +62,7 @@ Route::post('comment', Comment\StoreComment::class)->name('comment.store');
  > Inside my RouteServiceProvider, I have set my route namespace to 'App\Http\Actions'.
 
 
- ### Actions
+ ## Actions
 
  To generate an action, you may use the provided artisan command:
 
@@ -127,7 +127,7 @@ Very often, this is as complex as your actions (controllers) need to be.
 
 > Validation can be handled within the service's validator, which we will show in a moment([see Service Validators](#service-validators)). If you prefer not to use the service's validation, there's nothing stopping you from validating in your controller or using Laravel's form requests.
 
-### Services
+## Services
 
  To generate a service, you may use the provided artisan command:
 
@@ -179,7 +179,7 @@ class StoreCommentService extends Service
 3. The parameters from the Service call are passed to the ```run``` method. Within this method, you may work with those parameters or, if validation is used, you'll have access to the validated data via the Service's ```$data``` property.
 
 
-### Service Validators
+## Service Validators
 Service validators perform in the same way Laravel's form requests do.
 
 ```sh
@@ -223,12 +223,38 @@ In your Service, you will have access to the user via the ```$supplementals``` p
 
 ### getSupplementals method
 The ```getSupplementals()``` method will return the entire Collection if no arguments are passed. You may pass a string argument to get a specific value from the Collection.
-
 ```php
 $user = $this->getSupplementals('user');
 ```
 
-### Responders
+### Additional technique to access Service data/properties
+Services implement PHP's magic getter method. This allows for properties and data to be accessed directly on the Service as properties. The Service's ```data``` property will be considered first, then the ```supplementals```. If ```data``` and ```supplementals``` contain a value with the same key, the value from ```data``` will be used. For example:
+```php
+// UpdateUserService.php
+
+$user = $this->user; // The getter will search the Service's data and supplementals properties for a 'user' key.
+```
+
+## Cached Services
+If you need to cache the result of a call to a Service, the Service should implement the ```PerfectOblivion\ActionServiceResponder\Services\Contracts\CachedService``` interface. This interface required the implementation of two methods:
+```php
+    /**
+     * Get the unique cache identifier for the Service.
+     */
+    public function cacheIdentifier(): string;
+
+    /**
+     * Get the cache time for the Service.
+     *
+     * @return \DateTimeInterface|\DateInterval|int|null
+     */
+    public function cacheTime();
+```
+
+### Clearing the cache
+To clear the cache for a given key, you may use any of the Laravel provided techniques, or you can use ```PerfectOblivion\ActionServiceResponder\Services\CacheHandler::forget($service)```. Just pass the Service name to the ```forget()``` method.
+
+## Responders
 
 Finally, the responder will handle sending the response.
 
@@ -269,7 +295,7 @@ class StoreCommentResponder extends Responder
 }
 ```
 
-### Queued Services
+## Queued Services
 Services may also be queued. In order to do this, you have a couple of options:
 1. The service may implement the ShouldQueueService interface.
 2. Instead of using the ```call``` method from your controller, you may use the ```queue``` method.
@@ -323,7 +349,7 @@ public function __invoke(StoreCommentService $service, Request $request)
     return view('comments.index'); //if you don't use the $service parameter in the method body, your IDE will yell at you. Using autorun is not recommended if your Service doesn't return a value.
 ```
 
-### Alternative ways to call services
+## Alternative ways to call services
 In addition to the methods discussed above, you may call services by:
 1. Using the "CallsServices" trait in your controller:
   ```$this->call(MyService::class, $params);```
