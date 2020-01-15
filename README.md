@@ -122,10 +122,10 @@ class StoreComment extends Action
 Very often, this is as complex as your actions (controllers) need to be.
 
 1. The action receives the request.
-2. The data from the request is passed to the appropriate service. (See [note on Service parameters](*note-on-service-parameters-and-properties))
+2. The data from the request is passed to the appropriate service. (See [note on Service parameters](#note-on-service-parameters-and-properties)).
 3. The return value of the Service call is given to the responder to handle as it sees fit.
 
-> Validation can be handled within the service's validator, which we will show in a moment([see Service Validators](#service-validators)). If you prefer not to use the service's validation, there's nothing stopping you from validating in your controller or using Laravel's form requests.
+> Validation can be handled within the service's validator, which we will show in a moment, [see Service Validators](#service-validators). If you prefer not to use the service's validation, there's nothing stopping you from validating in your controller or using Laravel's form requests.
 
 ## Services
 
@@ -204,11 +204,9 @@ The signature of the Service ```run``` method is:
 ```php
 public function run(array $parameters = []);
 ```
-**Parameters**
-The $parameters passed to the ServiceCaller's ```call()``` method, will be passed to the Service's ```run()``` method. If using 'autorun' (See [autorun Services below](#taking-it-further-with-automation)), the current request input will be passed to the Service automatically.
+**Parameters**: The $parameters passed to the ServiceCaller's ```call()``` method, will be passed to the Service's ```run()``` method. If using 'autorun' (See [autorun Services below](#taking-it-further-with-automation)), the current request input will be passed to the Service automatically.
 
-**Properties**
-In addition to the passed parameters, there may be times when your Service needs access to additional data. When using a Service in the context of an HTTP request, any route parameters will be available in the Service via the ```$supplementals``` property ([See Supplemental class](https://github.com/perfect-oblivion/action-service-responder/blob/master/src/Services/Supplementals.php)]). You may also explicitly pass supplemental data to the Service by passing an extra array when the Service is called:
+**Properties**: In addition to the passed parameters, there may be times when your Service needs access to additional data. When using a Service in the context of an HTTP request, any route parameters will be available in the Service via the ```$supplementals``` property ([See Supplemental class](https://github.com/perfect-oblivion/action-service-responder/blob/master/src/Services/Supplementals.php)]). You may also explicitly pass supplemental data to the Service by passing an extra array when the Service is called:
 ```php
 StoreCommentService::call($request->only(['title', 'body']), ['user' => User::find(1)]);
 ```
@@ -228,7 +226,7 @@ $user = $this->getSupplementals('user');
 ```
 
 ### Additional technique to access Service data/properties
-Services implement PHP's magic getter method. This allows for properties and data to be accessed directly on the Service as properties. The Service's ```data``` property will be considered first, then the ```supplementals```. If ```data``` and ```supplementals``` contain a value with the same key, the value from ```data``` will be used. For example:
+Services implement PHP's magic get method. This allows for properties and data to be accessed directly on the Service as properties. The Service's ```data``` property will be considered first, then the ```supplementals```. If ```data``` and ```supplementals``` contain a value with the same key, the value from ```data``` will be used. For example:
 ```php
 // UpdateUserService.php
 
