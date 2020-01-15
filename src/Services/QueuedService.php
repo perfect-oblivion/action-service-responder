@@ -5,20 +5,14 @@ namespace PerfectOblivion\ActionServiceResponder\Services;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use PerfectOblivion\ActionServiceResponder\Services\Service;
 use PerfectOblivion\ActionServiceResponder\Services\Traits\DisablesAutorun;
 
 class QueuedService implements ShouldQueue
 {
     use Queueable, SerializesModels, InteractsWithQueue, Dispatchable, DisablesAutorun;
-
-    /** @var array */
-    protected $data;
-
-    /** @var array */
-    protected $parameters;
 
     /** @var array */
     public $queueableProperties = [
@@ -31,6 +25,12 @@ class QueuedService implements ShouldQueue
         'tries',
         'timeout',
     ];
+
+    /** @var array */
+    protected $data;
+
+    /** @var array */
+    protected $parameters;
 
     /** @var string */
     protected $serviceClass;
@@ -60,8 +60,8 @@ class QueuedService implements ShouldQueue
      */
     public function handle(): void
     {
-        $this->disableAutorun();
-        $service = resolve($this->serviceClass);
+        $this::disableAutorun();
+        $service = app()->make($this->serviceClass);
         $this->setCopiedServiceProperties($service);
 
         $service->run($this->parameters);
@@ -84,7 +84,7 @@ class QueuedService implements ShouldQueue
     }
 
     /**
-     * Set the properties for the Service
+     * Set the properties for the Service.
      *
      * @param  \PerfectOblivion\ActionServiceResponder\Services\Service  $service
      */
