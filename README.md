@@ -210,7 +210,7 @@ public function run(array $parameters = []);
 ```php
 StoreCommentService::call($request->only(['title', 'body']), ['user' => User::find(1)]);
 ```
-in this example, the User will be available through the ```$supplementals``` property of the Service ([See Supplemental class](https://github.com/perfect-oblivion/action-service-responder/blob/master/src/Services/Supplementals.php)]), or via the ```getSupplementals()``` method. See [getSupplementals() description below](#getSupplementals-method)Any route parameters will also be available.
+in this example, the User will be available through the ```$supplementals``` property of the Service ([See Supplemental class](https://github.com/perfect-oblivion/action-service-responder/blob/master/src/Services/Supplementals.php)), or via the ```getSupplementals()``` method. See [getSupplementals() description below](#getSupplementals-method)Any route parameters will also be available.
 The ```$supplementals``` property is an instance of ```Illuminate\Support\Collection```.
 
 For example, if your're hitting the following route:
