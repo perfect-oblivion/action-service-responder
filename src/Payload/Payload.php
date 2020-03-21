@@ -3,11 +3,11 @@
 namespace PerfectOblivion\ActionServiceResponder\Payload;
 
 use ArrayAccess;
-use Traversable;
-use JsonSerializable;
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use JsonSerializable;
 use PerfectOblivion\ActionServiceResponder\Payload\Contracts\PayloadContract;
+use Traversable;
 
 class Payload implements PayloadContract, ArrayAccess, JsonSerializable, Jsonable, Arrayable
 {
@@ -124,7 +124,7 @@ class Payload implements PayloadContract, ArrayAccess, JsonSerializable, Jsonabl
     /**
      * Get the wrapper for the output.
      */
-    public function getOutputWrapper(): string
+    public function getOutputWrapper(): ? string
     {
         return $this->outputWrapper;
     }

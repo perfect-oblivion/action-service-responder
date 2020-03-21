@@ -9,7 +9,7 @@ interface PayloadContract extends Status
      *
      * @param  int  $status
      */
-    public function setStatus(int $status): PayloadContract;
+    public function setStatus(int $status): self;
 
     /**
      * Get the status of the payload.
@@ -21,7 +21,7 @@ interface PayloadContract extends Status
      *
      * @param  array  $output
      */
-    public function setMessages(array $messages): PayloadContract;
+    public function setMessages(array $messages): self;
 
     /**
      * Get messages array from the payload.
@@ -34,7 +34,7 @@ interface PayloadContract extends Status
      * @param  mixed  $output
      * @param  string|null  $wrapper
      */
-    public function setOutput($output, ? string $wrapper = null): PayloadContract;
+    public function setOutput($output, ? string $wrapper = null): self;
 
     /**
      * Get the Payload output.
@@ -56,7 +56,7 @@ interface PayloadContract extends Status
     /**
      * Get the wrapper for the output.
      */
-    public function getOutputWrapper(): string;
+    public function getOutputWrapper(): ? string;
 
     /**
      * Get the wrapper for messages.

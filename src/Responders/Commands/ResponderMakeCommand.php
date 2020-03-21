@@ -2,9 +2,9 @@
 
 namespace PerfectOblivion\ActionServiceResponder\Responders\Commands;
 
+use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
-use Illuminate\Console\GeneratorCommand;
 
 class ResponderMakeCommand extends GeneratorCommand
 {
@@ -31,6 +31,8 @@ class ResponderMakeCommand extends GeneratorCommand
 
     /**
      * Execute the console command.
+     *
+     * @return bool|null
      */
     public function handle()
     {

@@ -3,21 +3,20 @@
 namespace PerfectOblivion\ActionServiceResponder\Actions;
 
 use BadMethodCallException;
+use PerfectOblivion\ActionServiceResponder\Actions\ActionMiddlewareOptions;
+use Symfony\Component\HttpFoundation\Response;
 
 class Action
 {
-    /** @var array */
-    protected $middleware = [];
+    protected array $middleware = [];
 
     /**
      * Register middleware on the action.
      *
      * @param  array|string|\Closure  $middleware
      * @param  array   $options
-     *
-     * @return \PerfectOblivion\ActionServiceResponder\ActionMiddlewareOptions
      */
-    public function middleware($middleware, array $options = [])
+    public function middleware($middleware, array $options = []): ActionMiddlewareOptions
     {
         foreach ((array) $middleware as $m) {
             $this->middleware[] = [
@@ -31,10 +30,8 @@ class Action
 
     /**
      * Get the middleware assigned to the action.
-     *
-     * @return array
      */
-    public function getMiddleware()
+    public function getMiddleware(): array
     {
         return $this->middleware;
     }
@@ -43,11 +40,9 @@ class Action
      * Execute an action on the action.
      *
      * @param  string  $method
-     * @param  array   $parameters
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param  array  $parameters
      */
-    public function callAction($method, $parameters)
+    public function callAction(string $method, array $parameters): Response
     {
         return call_user_func_array([$this, $method], $parameters);
     }
@@ -56,13 +51,13 @@ class Action
      * Handle calls to missing methods on the action.
      *
      * @param  string  $method
-     * @param  array   $parameters
+     * @param  array  $parameters
      *
      * @throws \BadMethodCallException
      *
      * @return mixed
      */
-    public function __call($method, $parameters)
+    public function __call(string $method, array $parameters)
     {
         throw new BadMethodCallException(sprintf(
             'Method %s::%s does not exist.',
