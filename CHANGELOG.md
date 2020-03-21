@@ -60,3 +60,7 @@ All notable changes to PerfectOblivion/Actions will be documented in this file
    -   To clear the cache, you may either use the key and clear the cache via the different ways that Laravel provides, or use the
        ```PerfectOblivion\ActionServiceProvider\Services\CacheHandler::forget($service)``` method. You may pass the name of the Service to the
        ```forget()``` method. If you have an instance of the Service, you may pass it instead of the Service name.
+
+## 0.2.0 - 2020-03-21
+
+-   Allow Laravel 7.0
