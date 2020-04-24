@@ -4,7 +4,7 @@
  * Sanitization functionality to be customized within this project before a 1.0 release.
  */
 
-namespace PerfectOblivion\ActionServiceResponder\Validation\Sanitizer\Laravel;
+namespace PerfectOblivion\ActionServiceResponder\Validation\Sanitizer;
 
 use Closure;
 use InvalidArgumentException;

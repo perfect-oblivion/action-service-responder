@@ -54,7 +54,10 @@
         "laravel": {
             "providers": [
                 "PerfectOblivion\\ActionServiceResponder\\ActionServiceResponderProvider"
-            ]
+            ],
+            "aliases": {
+                "Sanitizer": "PerfectOblivion\\ActionServiceResponder\\Facades\\Sanitizer\\Facade"
+            }
         }
     }
 }
