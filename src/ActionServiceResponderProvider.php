@@ -16,6 +16,7 @@ use PerfectOblivion\ActionServiceResponder\Services\Service;
 use PerfectOblivion\ActionServiceResponder\Services\ServiceCaller;
 use PerfectOblivion\ActionServiceResponder\Validation\Commands\CustomRuleMakeCommand;
 use PerfectOblivion\ActionServiceResponder\Validation\Commands\ValidationServiceMakeCommand;
+use PerfectOblivion\ActionServiceResponder\Validation\Sanitizer\Factory as SanitizerFactory;
 use PerfectOblivion\ActionServiceResponder\Validation\ValidationService\ValidationService;
 
 class ActionServiceResponderProvider extends BaseServiceProvider
@@ -59,6 +60,9 @@ class ActionServiceResponderProvider extends BaseServiceProvider
     {
         $this->app->singleton(ServiceCaller::class, function ($app) {
             return new ServiceCaller($app);
+        });
+        $this->app->singleton('sanitizer', function ($app) {
+            return new SanitizerFactory;
         });
 
         $this->app->alias(

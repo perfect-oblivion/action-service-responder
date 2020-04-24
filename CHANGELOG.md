@@ -64,3 +64,10 @@ All notable changes to PerfectOblivion/Actions will be documented in this file
 ## 0.2.0 - 2020-03-21
 
 -   Allow Laravel 7.0
+
+## 0.3.0 - 2020-04-24
+
+-   Fix autoload deprecation coming with next composer version.
+   -   Move the Sanitizer Facade to Facades/.
+   -   Register the sanitizer service in the package base service provider.
+   -   Autoload the sanitizer facade in package composer.json.
