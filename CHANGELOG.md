@@ -71,3 +71,7 @@ All notable changes to PerfectOblivion/Actions will be documented in this file
    -   Move the Sanitizer Facade to Facades/.
    -   Register the sanitizer service in the package base service provider.
    -   Autoload the sanitizer facade in package composer.json.
+
+## 0.3.2 - 2020-10-03
+
+-   Allow Laravel 8.0
